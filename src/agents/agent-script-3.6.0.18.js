@@ -59,17 +59,17 @@ const offset = {
   chatroom_member_nick_call_offset3: 0x55f6e0,
   chatroom_member_nick_call_offset4: 0x34cb10,
 };
-//3.3.0.115
+//3.6.0.18
 
 
 /*------------------global-------------------------------------------*/
-const availableVersion =  1661337618////3.3.0.115  ==1661141107
+const availableVersion =  1661337618 //3.6.0.18  ==1661141107
 
 const moduleBaseAddress = Module.getBaseAddress('WeChatWin.dll')
 const moduleLoad = Module.load('WeChatWin.dll')
 //1575CF98
-const g_EDIPtr      = moduleBaseAddress.add(0x222f38c).readPointer().add(0xD70).readPointer()//
-const g_EDIU32      = moduleBaseAddress.add(0x222f38c).readPointer().add(0xD70).readU32()
+const g_EDIPtr      = moduleBaseAddress.add(0x222f38c).readPointer().add(0xD70).readPointer() //3.6.0.18？
+const g_EDIU32      = moduleBaseAddress.add(0x222f38c).readPointer().add(0xD70).readU32() //3.6.0.18？
 let currentVersion = 0
 
 let nodeList = []  //for contact
@@ -449,6 +449,8 @@ const getWxTest = ( (contactId,filePath)=>{
 
 
 })
+
+// 获取测试信息
 const getTestInfoFunction = ((addr) => {
   const nativeativeFunction = new NativeFunction(ptr(addr), 'void', [])
   nativeativeFunction()
@@ -468,19 +470,18 @@ const getTestInfoFunction = ((addr) => {
 
 })
 
-// get global data
-
+// 判断是否登陆
 const isLoggedInFunction = (() => {
   loggedIn = moduleBaseAddress.add(offset.is_logged_in_offset).readU32()
   return !!loggedIn
 })
 
-// get myself info
-
+// 获取基础节点地址
 const getBaseNodeAddress = (() => {
   return moduleBaseAddress.add(offset.node_offset).readPointer()
 })
 
+// 获取心跳节点地址
 const getHeaderNodeAddress = (() => {
   const baseAddress = getBaseNodeAddress()
   //console.log('baseAddress',baseAddress)
@@ -492,6 +493,7 @@ const getHeaderNodeAddress = (() => {
   return baseAddress.add(offset.handle_offset).readPointer()
 })
 
+// 获取群列表节点地址
 const getChatroomNodeAddress = (() => {
   const baseAddress = getBaseNodeAddress()
   if (baseAddress.isNull()) {
@@ -500,7 +502,7 @@ const getChatroomNodeAddress = (() => {
   return baseAddress.add(offset.chatroom_node_offset).readPointer()
 })
 
-
+// 获取机器人信息
 const getMyselfInfoFunction = (() => {
 
   let ptr = 0
@@ -526,7 +528,16 @@ const getMyselfInfoFunction = (() => {
   return JSON.stringify(myself)
 
 })
-// chatroom member
+
+// 获取机器人ID
+const getMyselfIdFunction = (() => {
+
+  let wx_id = readString(moduleBaseAddress.add(offset.wxid_offset))
+  return wx_id
+
+})
+
+// 群信息递归
 const chatroomRecurse = ((node) => {
   const chatroomNodeAddress = getChatroomNodeAddress()
   if (chatroomNodeAddress.isNull()) { return }
@@ -570,6 +581,7 @@ const chatroomRecurse = ((node) => {
   return allChatroomMemberJson
 })
 
+// 读取xxx
 // std::string
 // const str = readStringPtr(ptr).readUtf8String()
 const readStringPtr = (address) => {
@@ -596,6 +608,7 @@ const readStringPtr = (address) => {
   return addr
 }
 
+ // 写入xxx
 // std::wstring
 // const wstr = readWStringPtr(ptr).readUtf16String()
 const readWStringPtr = (address) => {
@@ -976,10 +989,10 @@ const getQrcodeLoginData = () => {
   return nativeCallback
 })()*/
 
+// 接收消息回调 TBD
 /**
  * @Hook: recvMsg -> recvMsgNativeCallback
  */
-/*
 const recvMsgNativeCallback = (() => {
 
   
@@ -1067,7 +1080,7 @@ const recvMsgNativeCallback = (() => {
       }
     })
   return nativeCallback
-})()*/
+})()
 
 
 let msgStruct = null
@@ -1090,6 +1103,8 @@ const initmsgStruct = ((str) => {
 
 let retidNullStruct = null
 let retidNullPtr = null
+
+// 新增
 const initNullIdStruct = ((str) => {
 
   retidNullPtr = Memory.alloc(str.length * 2 + 1)
@@ -1544,7 +1559,6 @@ const sendAttatchMsgNativeFunction = ((contactId, senderId,path,filename,size) =
   //console.log('-------',attatchEbp1C.add(0x8).readPointer())
 })
 /*-----------------send pic 3.6.0.18----------------*/
-/*------------------send pic --------------------------*/
 let buffwxid = null
 let imagefilepath = null
 let pathPtr = null
@@ -1666,78 +1680,7 @@ const sendPicMsgNativeFunction = ((contactId, path) => {
   nativeativeFunction()
 
 })
-/*------------------send pic --------------------------
-let buffwxid = null
-let imagefilepath = null
-let pathPtr = null
-let picWxid = null
-let picWxidPtr = null
-let picAsm = null
-let picbuff = null
-const sendPicMsgNativeFunction = ((contactId, path) => {
 
-  picAsm = Memory.alloc(Process.pageSize)
-  buffwxid = Memory.alloc(0x20)
-  picbuff = Memory.alloc(0x378)
-
-  pathPtr = Memory.alloc(path.length * 2 + 1)
-  pathPtr.writeUtf16String(path)
-
-  imagefilepath = Memory.alloc(0x24)
-  imagefilepath.writePointer(pathPtr).add(0x04)
-    .writeU32(path.length * 2).add(0x04)
-    .writeU32(path.length * 2).add(0x04)
-
-  picWxidPtr = Memory.alloc(contactId.length * 2 + 1)
-  picWxidPtr.writeUtf16String(contactId)
-
-  picWxid = Memory.alloc(0x0c)
-  picWxid.writePointer(ptr(picWxidPtr)).add(0x04)
-    .writeU32(contactId.length * 2).add(0x04)
-    .writeU32(contactId.length * 2).add(0x04)
-
-  Memory.patchCode(picAsm, Process.pageSize, code => {
-    var cw = new X86Writer(code, { pc: picAsm })
-    cw.putPushfx();
-    cw.putPushax();
-
-    cw.putSubRegImm('esp', 0x14)
-    cw.putMovRegAddress('eax', buffwxid)
-
-    cw.putMovRegReg('ecx', 'esp')
-
-    cw.putPushReg('eax')
-    cw.putCallAddress(moduleBaseAddress.add(
-      offset.send_picmsg_call_offset1
-    ))
-
-    cw.putMovRegAddress('ebx', imagefilepath)
-    cw.putPushReg('ebx')
-
-    cw.putMovRegAddress('eax', picWxid)
-    cw.putPushReg('eax')
-
-    cw.putMovRegAddress('eax', picbuff)
-    cw.putPushReg('eax')
-    cw.putCallAddress(moduleBaseAddress.add(
-      offset.send_picmsg_call_offset2
-    ))
-
-    cw.putMovRegReg('ecx', 'eax')
-    cw.putCallAddress(moduleBaseAddress.add(
-      offset.send_picmsg_call_offset3
-    ))
-    cw.putPopax()
-    cw.putPopfx()
-    cw.putRet()
-    cw.flush()
-
-  })
-
-  const nativeativeFunction = new NativeFunction(ptr(picAsm), 'void', [])
-  nativeativeFunction()
-
-})*/
 /**
 * send at msg
 */
