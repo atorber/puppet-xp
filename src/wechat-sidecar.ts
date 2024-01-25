@@ -120,6 +120,15 @@ class WeChatSidecar extends SidecarBody {
   // @Call(agentTarget('getTestInfoFunction'))
   // getTestInfo ():Promise<string> { return Ret() }
 
+  @Call(agentTarget('getWechatVersionFunction'))
+  getWeChatVersion ():Promise<number> { return Ret() }
+
+  @Call(agentTarget('getWechatVersionStringFunction'))
+  getWechatVersionString ():Promise<string> { return Ret() }
+
+  @Call(agentTarget('checkSupportedFunction'))
+  checkSupported ():Promise<Boolean> { return Ret() }
+
   @Call(agentTarget('getLoginUrlFunction'))
   getLoginUrl ():Promise<string> { return Ret() }
 
@@ -142,15 +151,6 @@ class WeChatSidecar extends SidecarBody {
 
   @Call(agentTarget('getChatroomMemberInfoFunction'))
   getChatroomMemberInfo ():Promise<string> { return Ret() }
-
-  @Call(agentTarget('getWechatVersionFunction'))
-  getWeChatVersion ():Promise<number> { return Ret() }
-
-  @Call(agentTarget('getWechatVersionStringFunction'))
-  getWechatVersionString ():Promise<string> { return Ret() }
-
-  @Call(agentTarget('checkSupportedFunction'))
-  checkSupported ():Promise<Boolean> { return Ret() }
 
   // @Call(agentTarget('callLoginQrcodeFunction'))
   // callLoginQrcode (
@@ -214,10 +214,10 @@ class WeChatSidecar extends SidecarBody {
   //   @ParamType('pointer', 'Utf8String') pairWaitTip: string,
   // ) { return Ret(status, qrcodeUrl, wxid, avatarUrl, nickname, phoneType, phoneClientVer, pairWaitTip) }
 
-  @Hook(agentTarget('hookLogoutEventCallback'))
-  logoutEvent (
-    @ParamType('int32', 'U32') bySrv: number,
-  ) { return Ret(bySrv) }
+  // @Hook(agentTarget('hookLogoutEventCallback'))
+  // logoutEvent (
+  //   @ParamType('int32', 'U32') bySrv: number,
+  // ) { return Ret(bySrv) }
 
   @Hook(agentTarget('hookLoginEventCallback'))
   loginEvent (

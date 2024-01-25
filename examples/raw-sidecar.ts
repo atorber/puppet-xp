@@ -23,12 +23,12 @@ import {
   detach,
 } from 'sidecar'
 
-import { 
-  WeChatSidecar, 
-  // XpSidecar 
+import {
+  WeChatSidecar,
+  // XpSidecar
 } from '../src/wechat-sidecar.js'
 
-async function main() {
+async function main () {
   console.info('WeChat Sidecar starting...')
   // new XpSidecar({ wechatVersion: '3.9.2.23' })
 
@@ -42,9 +42,9 @@ async function main() {
   const isSupported = await sidecar.checkSupported()
   console.info(`\nWeChat Version: ${ver} -> ${verStr} , Supported: ${isSupported}\n`)
 
-  const isLoggedIn = false
+  let isLoggedIn = false
   const myselfInfo = await sidecar.getMyselfInfo()
-  console.info(`当前登陆账号信息: ${myselfInfo}`)
+  console.info(`当前登陆账号信息: ${JSON.stringify(myselfInfo)}`)
 
   const loginUrl = await sidecar.getLoginUrl()
   console.info(`登陆二维码地址loginUrl: ${loginUrl}`)
@@ -60,20 +60,21 @@ async function main() {
         onScan(args)
         break
       case 'loginEvent':{
-        if(!isLoggedIn){
+        if (!isLoggedIn) {
           const loginRes = await sidecar.isLoggedIn()
-          if(loginRes){
+          console.info('loginEvent: 登陆状态:', loginRes)
+          if (loginRes === 1) {
             onLogin()
           }
-        } 
+        }
         break
       }
       case 'agentReady':
         console.log('agentReady...')
         break
-      case 'logoutEvent':
-        onLogout(args[0] as number)
-        break
+      // case 'logoutEvent':
+      //   onLogout(args[0] as number)
+      //   break
       default:
         console.info('onHook没有匹配到处理方法:', method, JSON.stringify(args))
         break
@@ -84,7 +85,12 @@ async function main() {
   const onLogin = async () => {
     console.info('登陆事件触发')
     console.info(`登陆状态: ${isLoggedIn}`)
-    // await sidecar.sendMsg('filehelper', 'Sidecar is ready!')
+    if (isLoggedIn) {
+      return
+    }else{
+      isLoggedIn = true
+      try{
+            // await sidecar.sendMsg('filehelper', 'Sidecar is ready!')
     const contacts = await sidecar.getContact()
     // console.log(`contacts: ${contacts}`)
     const contactsJSON = JSON.parse(contacts)
@@ -101,6 +107,10 @@ async function main() {
     // for (const room of roomListJSON) {
     //   console.info('room:', room)
     // }
+      }catch(e){
+        console.error('获取联系人列表失败:', e)
+      }
+    }
   }
 
   const onLogout = (bySrv: number) => {
@@ -147,7 +157,7 @@ async function main() {
     // const nickname = await sidecar.GetContactOrChatRoomNickname(talkerId)
     // console.log('发言人昵称：', nickname)
 
-    const talker = await sidecar.getChatroomMemberNickInfo(talkerId,toId)
+    const talker = await sidecar.getChatroomMemberNickInfo(talkerId, toId)
     console.log('发言人：', talker)
     if (talkerId && text === 'ding') {
       console.info('叮咚测试: ding found, reply dong')
@@ -166,6 +176,6 @@ async function main() {
 }
 
 main()
-  .catch(e=>{
+  .catch(e => {
     console.error('主函数运行失败:', e)
   })
