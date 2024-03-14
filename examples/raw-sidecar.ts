@@ -42,63 +42,78 @@ async function main () {
   const isSupported = await sidecar.checkSupported()
   console.info(`\nWeChat Version: ${ver} -> ${verStr} , Supported: ${isSupported}\n`)
 
-  let isLoggedIn = false
+  const isLoggedIn = await sidecar.isLoggedIn()
   const myselfInfo = await sidecar.getMyselfInfo()
-  console.info(`当前登陆账号信息: ${JSON.stringify(myselfInfo)}`)
+  console.info(`当前登陆账号信息: ${myselfInfo}`)
 
   const loginUrl = await sidecar.getLoginUrl()
   console.info(`登陆二维码地址loginUrl: ${loginUrl}`)
 
-  sidecar.on('hook', async ({ method, args }) => {
+  // const contact = await sidecar.getChatroomMemberInfo()
+  // //console.log(contact)
+  // for (const item of JSON.parse(contact)) {
+  //   for(const wxid of item.roomMember){
+  //     //console.log(wxid)
+  //     if(wxid === 'tyutluyc'){
+  //       const nick = await sidecar.getChatroomMemberNickInfo(wxid,item.roomid)
+  //       console.log('wxid:====',wxid,"==nick:===",nick)
+  //     }
+  //   }
+
+  // }
+
+  sidecar.on('hook', ({ method, args }) => {
     // console.log(`onhook事件消息：${new Date().toLocaleString()}\n`, method, JSON.stringify(args))
     console.log(`onhook事件消息：${new Date().toLocaleString()}`, method)
     switch (method) {
-      case 'recvMsg':
+      case 'recvMsg':{
         void onRecvMsg(args)
         break
+      }
       case 'checkQRLogin':
-        onScan(args)
+        void onScan(args)
         break
       case 'loginEvent':{
         if (!isLoggedIn) {
-          const loginRes = await sidecar.isLoggedIn()
-          console.info('loginEvent: 登陆状态:', loginRes)
-          if (loginRes === 1) {
-            onLogin()
-          }
+          let loginRes = false
+          sidecar.isLoggedIn().then(res => {
+            loginRes = res
+            if (loginRes) {
+              void onLogin()
+            }
+            return res
+          }).catch(e => {
+            console.error('登录状态检查失败:', e)
+          })
         }
         break
       }
       case 'agentReady':
         console.log('agentReady...')
         break
-      // case 'logoutEvent':
-      //   onLogout(args[0] as number)
-      //   break
+      case 'logoutEvent':
+        onLogout(args[0] as number)
+        break
       default:
         console.info('onHook没有匹配到处理方法:', method, JSON.stringify(args))
         break
     }
-
   })
 
   const onLogin = async () => {
     console.info('登陆事件触发')
     console.info(`登陆状态: ${isLoggedIn}`)
-    if (isLoggedIn) {
-      return
-    }else{
-      isLoggedIn = true
-      try{
-            // await sidecar.sendMsg('filehelper', 'Sidecar is ready!')
+    // await sidecar.sendMsg('filehelper', 'Sidecar is ready!')
     const contacts = await sidecar.getContact()
     // console.log(`contacts: ${contacts}`)
     const contactsJSON = JSON.parse(contacts)
     console.log('contacts列表:', contactsJSON.length)
 
-    // for (const contact of contactsJSON) {
-    //     console.info('好友:', contact)
-    // }
+    for (const contact of contactsJSON) {
+      if (!contact.name) {
+        console.info('好友:', JSON.stringify(contact))
+      }
+    }
 
     const roomList = await sidecar.getChatroomMemberInfo()
     // console.log(`roomList: ${roomList}`)
@@ -107,10 +122,8 @@ async function main () {
     // for (const room of roomListJSON) {
     //   console.info('room:', room)
     // }
-      }catch(e){
-        console.error('获取联系人列表失败:', e)
-      }
-    }
+    // await sidecar.sendAtMsg('21341182572@chatroom', new Date().toLocaleString(), 'atorber', '超哥');
+
   }
 
   const onLogout = (bySrv: number) => {
@@ -166,9 +179,9 @@ async function main () {
     }
   }
 
-  const clean = async () => {
+  const clean =  () => {
     console.info('Sidecar detaching...')
-    await detach(sidecar)
+    void detach(sidecar)
   }
 
   process.on('SIGINT', clean)

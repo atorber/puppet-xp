@@ -1,5 +1,6 @@
 # Wechaty Puppet XP
 
+[![Join Wechaty Discord Developer Community](https://img.shields.io/discord/916984413944967180?logo=discord&style=flat)](https://discord.gg/uE8Tb77VBm)
 [![NPM](https://github.com/wechaty/wechaty-puppet-xp/workflows/NPM/badge.svg)](https://github.com/wechaty/wechaty/actions?query=workflow%3ANPM)
 [![NPM Version](https://img.shields.io/npm/v/wechaty-puppet-xp?color=brightgreen)](https://www.npmjs.com/package/wechaty-puppet-xp)
 [![npm (tag)](https://img.shields.io/npm/v/wechaty-puppet-xp/next.svg)](https://www.npmjs.com/package/wechaty-puppet-xp?activeTab=versions)
@@ -12,9 +13,10 @@
 [![GitHub stars](https://img.shields.io/github/stars/wechaty/wechaty-puppet-xp.svg?label=github%20stars)](https://github.com/wechaty/wechaty)
 [![Gitter](https://badges.gitter.im/wechaty/wechaty.svg)](https://gitter.im/wechaty/wechaty?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-<img src="https://camo.githubusercontent.com/6c7c7e10053c8e1936c084d17ea74c3437759fd1c4d3e02acca9256e2bfe9bb3/68747470733a2f2f692e6c6f6c692e6e65742f323032302f30352f30392f4858436c49663541324570554734752e706e67" alt="chatie puppet xp" width="300" height="300" align="bottom" />
+<img src="https://github.com/atorber/puppet-xp/assets/19552906/ac34b791-bfff-4beb-9631-088939d40465" alt="chatie puppet xp" width="300" height="300" align="bottom" />
 
 Official website: <https://wechaty.js.org/docs/puppet-providers/xp>
+XP Discord: <https://discord.gg/uE8Tb77VBm>
 
 ## WECHATY PUPPET YOUTH STAR
 
@@ -26,17 +28,21 @@ wechaty-puppet-xp is a local puppet for Wechaty:
 ## GETTING STARTED
 
 - STEP 1: Install wechat client in your Windows computer.
+
+> 1.13.0+ is the latest version, only support WeChat v3.9.2.23. Note to use the npm package that matches the WeChat version.
+
 - STEP 2: Login the wechat client on the computer.
 - STEP 3: Getting Started with TypeScript/JavaScript (RECOMMENDED).
-
-## QUICK START
-
-> 1.12.0+ is the latest version, only support WeChat v3.6.0.18, 1.11.14 is the last version base WeChat v3.3.0.115. Note to use the npm package that matches the WeChat version.
 
 ```sh
 git clone https://github.com/wechaty/wechaty-puppet-xp.git
 cd wechaty-puppet-xp
+
+# 安装依赖
 npm install
+
+# 启动程序
+npm start
 #
 # Do not forget to install WeChat with requried version and login.
 #
@@ -48,50 +54,60 @@ npm install
 | `npm run start:ripe` | [examples/ripe-wechaty.ts](examples/ripe-wechaty.ts) | Wechaty ding/dong |
 | `npm run start:raw` | [examples/raw-sidecar.ts](examples/raw-sidecar.ts) | Sidecar ding/dong |
 
+## RUNNING WHITH NPM
+
+puppet-xp also have already released the installation package on NPM. Running with NPM and more examples can be referred to [wechaty-puppet-xp-getting-started](https://github.com/atorber/wechaty-puppet-xp-getting-started).
+
 ## PUPPET COMPARISON
 
 XP is a young puppet,it keeps growing and improving.
 
-Puppet|xp👍|
-:---|:---|
-支持账号|个人微信|
+版本|3.3.0.115|3.6.0.18|3.9.2.23|
+:---|:---|:---|:---|
 **<消息>**|
-接收文本|✅
-接收图片|✅
-接收文件|✅
-接收动图|✅
-接收表情|✅
-接收小程序卡片|✅
-接收联系人卡片|✅
-接收位置卡片|✅
-发送文本|✅
-发送图片|✅
-发送文件|✅
-发送动图|✅（以文件形式发送）
+接收文本|✅|✅|✅
+接收图片|✅|✅|✅
+接收文件|✅|✅|✅
+接收动图|✅|✅|✅
+接收表情|✅|✅|✅
+接收小程序卡片|✅|✅|✅
+接收联系人卡片|✅|✅|✅
+接收位置卡片|✅|✅|✅
+发送文本|✅|✅|✅
+发送图片|✅|✅|✅
+发送文件|✅|✅|✅
+发送动图|✅|✅|✅
 **<群组>**|
-@群成员|✅
-群列表|✅
-群成员列表|✅
-群详情|✅
-进群提示|✅
+@群成员|✅|✅|✅
+群列表|✅|✅|✅
+群成员列表|✅|✅|✅
+群详情|✅|✅|✅
+进群提示|✅|✅|✅
 **<联系人>**|
-好友列表|✅
-好友详情|✅
+好友列表|✅|✅|✅
+好友详情|✅|✅|✅
 **<其他>**|
-登录事件|✅
-依赖协议|Windows
+登录事件|✅|✅|✅
+扫码登录|||✅
 
 ## VERSION SUPPORT
 
-puppet-xp|wechat|
-|:---|:---|
-|1.11.14|[WeChat-v3.3.0.115](https://github.com/wechaty/wechaty-puppet-xp/releases/download/v0.5/WeChatSetup-v3.3.0.115.exe)|
-|1.12.7|[WeChat-v3.6.0.18](https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.6.0.18/WeChatSetup-3.6.0.18.exe)|
-|1.3.x|[WeChat-v3.9.2.23](https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.9.2.23/WeChatSetup-3.9.2.23.exe)|
+Note: You need to install an NPM version that matches your WeChat client version.
+
+puppet-xp|wechat|npm install|
+|:---|:---|:---|
+|1.3.x|[WeChat-v3.9.2.23](https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.9.2.23/WeChatSetup-3.9.2.23.exe)|npm i wechaty-puppet-xp@next|
+|1.12.7|[WeChat-v3.6.0.18](https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.6.0.18/WeChatSetup-3.6.0.18.exe)|npm i wechaty-puppet-xp@1.12.7|
+|1.11.14|[WeChat-v3.3.0.115](https://github.com/wechaty/wechaty-puppet-xp/releases/download/v0.5/WeChatSetup-v3.3.0.115.exe)|npm i wechaty-puppet-xp@1.11.14|
 
 ## HISTORY
 
-### next v1.13.0 (September 21, 2023)
+### next v1.13.9
+
+1. Add setting for contact remark
+2. Optimize sample code
+
+### v1.13.0 (September 21, 2023)
 
 1. This version start to support WeChat v3.9.2.23,need to update WeChat on your pc to 3.9.2.23
 2. [WeChatSetup-v3.9.2.23.exe](https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.9.2.23/WeChatSetup-3.9.2.23.exe)

@@ -79,7 +79,7 @@ class PuppetXp extends PUPPET.Puppet {
   }
 
   constructor (
-    public override options: PuppetXpOptions = { wechatVersion:'3.9.2.23' },
+    public override options: PuppetXpOptions = {},
   ) {
     log.info('options...', JSON.stringify(options))
     super(options)
@@ -234,7 +234,7 @@ class PuppetXp extends PUPPET.Puppet {
   }
 
   private onHookRecvMsg (args: any) {
-    log.info('onHookRecvMsg', JSON.stringify(args))
+    // log.info('onHookRecvMsg', JSON.stringify(args))
     let type = PUPPET.types.Message.Unknown
     let roomId = ''
     let toId = ''
@@ -404,96 +404,98 @@ class PuppetXp extends PUPPET.Puppet {
     }
 
     try {
-      if (code === 10000) {
-        // 你邀请"瓦力"加入了群聊
-        // "超超超哥"邀请"瓦力"加入了群聊
-        // "luyuchao"邀请"瓦力"加入了群聊
-        // "超超超哥"邀请你加入了群聊，群聊参与人还有：瓦力
+      if (this.isLoggedIn) {
+        if (code === 10000) {
+          // 你邀请"瓦力"加入了群聊
+          // "超超超哥"邀请"瓦力"加入了群聊
+          // "luyuchao"邀请"瓦力"加入了群聊
+          // "超超超哥"邀请你加入了群聊，群聊参与人还有：瓦力
 
-        // 你将"瓦力"移出了群聊
-        // 你被"luyuchao"移出群聊
+          // 你将"瓦力"移出了群聊
+          // 你被"luyuchao"移出群聊
 
-        // 你修改群名为“瓦力专属”
-        // 你修改群名为“大师是群主”
-        // "luyuchao"修改群名为“北辰香麓欣麓园抗疫”
+          // 你修改群名为“瓦力专属”
+          // 你修改群名为“大师是群主”
+          // "luyuchao"修改群名为“北辰香麓欣麓园抗疫”
 
-        const room = this.roomStore[roomId]
-        //  log.info('room=========================', room)
-        let topic = ''
-        const oldTopic = room ? room.topic : ''
+          const room = this.roomStore[roomId]
+          //  log.info('room=========================', room)
+          let topic = ''
+          const oldTopic = room ? room.topic : ''
 
-        if (text.indexOf('修改群名为') !== -1) {
-          const arrInfo = text.split('修改群名为')
-          let changer = this.selfInfo
-          if (arrInfo[0] && room) {
-            topic = arrInfo[1]?.split(/“|”|"/)[1] || ''
-            //  topic = arrInfo[1] || ''
-            this.roomStore[roomId] = room
-            room.topic = topic
-            if (arrInfo[0] === '你') {
-              //  changer = this.selfInfo
-            } else {
-              const name = arrInfo[0].split(/“|”|"/)[1] || ''
-              for (const i in this.contactStore) {
-                if (this.contactStore[i] && this.contactStore[i]?.name === name) {
-                  changer = this.contactStore[i]
+          if (text.indexOf('修改群名为') !== -1) {
+            const arrInfo = text.split('修改群名为')
+            let changer = this.selfInfo
+            if (arrInfo[0] && room) {
+              topic = arrInfo[1]?.split(/“|”|"/)[1] || ''
+              //  topic = arrInfo[1] || ''
+              this.roomStore[roomId] = room
+              room.topic = topic
+              if (arrInfo[0] === '你') {
+                //  changer = this.selfInfo
+              } else {
+                const name = arrInfo[0].split(/“|”|"/)[1] || ''
+                for (const i in this.contactStore) {
+                  if (this.contactStore[i] && this.contactStore[i]?.name === name) {
+                    changer = this.contactStore[i]
+                  }
                 }
-              }
 
-            }
-          }
-          //  log.info(room)
-          //  log.info(changer)
-          //  log.info(oldTopic)
-          //  log.info(topic)
-          const changerId = changer.id
-          this.emit('room-topic', { changerId, newTopic: topic, oldTopic, roomId })
-
-        }
-        if (text.indexOf('加入了群聊') !== -1) {
-          const inviteeList = []
-          let inviter = this.selfInfo
-          const arrInfo = text.split(/邀请|加入了群聊/)
-
-          if (arrInfo[0]) {
-            topic = arrInfo[0]?.split(/“|”|"/)[1] || ''
-            if (arrInfo[0] === '你') {
-              //  changer = this.selfInfo
-            } else {
-              const name = arrInfo[0].split(/“|”|"/)[1] || ''
-              for (const i in this.contactStore) {
-                if (this.contactStore[i] && this.contactStore[i]?.name === name) {
-                  inviter = this.contactStore[i]
-                }
               }
             }
-          }
+            //  log.info(room)
+            //  log.info(changer)
+            //  log.info(oldTopic)
+            //  log.info(topic)
+            const changerId = changer.id
+            this.emit('room-topic', { changerId, newTopic: topic, oldTopic, roomId })
 
-          if (arrInfo[1]) {
-            topic = arrInfo[1]?.split(/“|”|"/)[1] || ''
-            if (arrInfo[1] === '你') {
-              inviteeList.push(this.selfInfo.id)
-            } else {
-              const name = arrInfo[1].split(/“|”|"/)[1] || ''
-              for (const i in this.contactStore) {
-                if (this.contactStore[i] && this.contactStore[i]?.name === name) {
-                  if (this.contactStore[i]?.id && room?.memberIdList.includes(this.contactStore[i]?.id || '')) {
-                    inviteeList.push(this.contactStore[i]?.id)
+          }
+          if (text.indexOf('加入了群聊') !== -1) {
+            const inviteeList = []
+            let inviter = this.selfInfo
+            const arrInfo = text.split(/邀请|加入了群聊/)
+
+            if (arrInfo[0]) {
+              topic = arrInfo[0]?.split(/“|”|"/)[1] || ''
+              if (arrInfo[0] === '你') {
+                //  changer = this.selfInfo
+              } else {
+                const name = arrInfo[0].split(/“|”|"/)[1] || ''
+                for (const i in this.contactStore) {
+                  if (this.contactStore[i] && this.contactStore[i]?.name === name) {
+                    inviter = this.contactStore[i]
                   }
                 }
               }
-
             }
-          }
-          //  log.info(inviteeList)
-          //  log.info(inviter)
-          //  log.info(room)
 
-          this.emit('room-join', { inviteeIdList: inviteeList, inviterId: inviter.id, roomId })
+            if (arrInfo[1]) {
+              topic = arrInfo[1]?.split(/“|”|"/)[1] || ''
+              if (arrInfo[1] === '你') {
+                inviteeList.push(this.selfInfo.id)
+              } else {
+                const name = arrInfo[1].split(/“|”|"/)[1] || ''
+                for (const i in this.contactStore) {
+                  if (this.contactStore[i] && this.contactStore[i]?.name === name) {
+                    if (this.contactStore[i]?.id && room?.memberIdList.includes(this.contactStore[i]?.id || '')) {
+                      inviteeList.push(this.contactStore[i]?.id)
+                    }
+                  }
+                }
+
+              }
+            }
+            //  log.info(inviteeList)
+            //  log.info(inviter)
+            //  log.info(room)
+
+            this.emit('room-join', { inviteeIdList: inviteeList, inviterId: inviter.id, roomId })
+          }
+        } else {
+          this.messageStore[payload.id] = payload
+          this.emit('message', { messageId: payload.id })
         }
-      } else {
-        this.messageStore[payload.id] = payload
-        this.emit('message', { messageId: payload.id })
       }
     } catch (e) {
       log.error('emit message fail:', e)
@@ -533,8 +535,9 @@ class PuppetXp extends PUPPET.Puppet {
 
     for (const contactKey in contactList) {
       const contactInfo = contactList[contactKey]
-
+      log.verbose('PuppetXp', 'contactInfo:%s', JSON.stringify(contactInfo))
       let contactType = PUPPET.types.Contact.Individual
+      // log.info('contactInfo.id', contactInfo.id)
       if (contactInfo.id.indexOf('gh_') !== -1) {
         contactType = PUPPET.types.Contact.Official
       }
@@ -644,6 +647,10 @@ class PuppetXp extends PUPPET.Puppet {
 
   override async contactAlias (contactId: string, alias?: string | null): Promise<void | string> {
     log.verbose('PuppetXp', 'contactAlias(%s, %s)', contactId, alias)
+    if (alias) {
+      await this.sidecar.modifyContactRemark(contactId, alias)
+      return alias
+    }
     const contact = await this.contactRawPayload(contactId)
     // if (typeof alias === 'undefined') {
     //   throw new Error('to be implement')
@@ -732,12 +739,11 @@ class PuppetXp extends PUPPET.Puppet {
     imageType: PUPPET.types.Image,
   ): Promise<FileBoxInterface> {
 
-    log.info('PuppetXp', 'messageImage(%s, %s[%s])',
-      messageId,
-      imageType,
-      PUPPET.types.Image[imageType],
-    )
-
+    // log.info('PuppetXp', 'messageImage(%s, %s, %s)',
+    //   messageId,
+    //   imageType,
+    //   PUPPET.types.Image[imageType],
+    // )
     const message = this.messageStore[messageId]
     let base64 = ''
     let fileName = ''
@@ -749,18 +755,21 @@ class PuppetXp extends PUPPET.Puppet {
         const picData = JSON.parse(message.text)
         const filePath = picData[imageType]
         const dataPath = rootPath + filePath    // 要解密的文件路径
-        log.info(dataPath, true)
+        // log.info('图片原始文件路径：', dataPath, true)
 
-        //  如果请求的是大图等待2s
-        if (imageType === PUPPET.types.Image.HD) {
-          await wait(1500)
-          if (!fs.existsSync(dataPath)) {
-            await wait(1500)
+        //  检测图片原始文件是否存在，如果存在则继续，如果不存在则每隔0.5秒后检测一次，直到10s后还不存在则继续
+        let fileExist = fs.existsSync(dataPath)
+        let count = 0
+        while (!fileExist) {
+          await wait(500)
+          fileExist = fs.existsSync(dataPath)
+          if (count > 20) {
+            break
           }
+          count++
         }
-
         await fsPromise.access(dataPath)
-
+        // log.info('图片解密文件路径：', dataPath, true)
         const imageInfo = ImageDecrypt(dataPath, messageId)
         // const imageInfo = ImageDecrypt('C:\\Users\\choogoo\\Documents\\WeChat Files\\wxid_pnza7m7kf9tq12\\FileStorage\\Image\\Thumb\\2022-05\\e83b2aea275460cd50352559e040a2f8_t.dat','cl34vez850000gkmw2macd3dw')
 
@@ -774,7 +783,7 @@ class PuppetXp extends PUPPET.Puppet {
         const paths = dataPath.split('\\')
         paths[paths.length - 1] = fileName
         imagePath = paths.join('\\')
-        // log.debug(imagePath)
+        log.info('图片解密后文件路径：', imagePath, true)
         await file.toFile(imagePath)
       }
     } catch (err) {
@@ -883,7 +892,9 @@ class PuppetXp extends PUPPET.Puppet {
 
   override async messageRawPayload (id: string): Promise<PUPPET.payloads.Message> {
     log.verbose('PuppetXp', 'messageRawPayload(%s)', id)
-
+    if (!this.isLoggedIn) {
+      throw new Error('not logged in')
+    }
     const payload = this.messageStore[id]
     if (!payload) {
       throw new Error('no payload')
@@ -897,7 +908,9 @@ class PuppetXp extends PUPPET.Puppet {
     mentionIdList?: string[],
   ): Promise<void> {
     if (conversationId.split('@').length === 2 && mentionIdList && mentionIdList[0]) {
-      await this.sidecar.sendAtMsg(conversationId, text, mentionIdList[0])
+      const wxid = mentionIdList[0]
+      const contact = await this.contactRawPayload(wxid)
+      await this.sidecar.sendAtMsg(conversationId, text, mentionIdList[0], contact.name)
     } else {
       await this.sidecar.sendMsg(conversationId, text)
     }
@@ -1025,19 +1038,10 @@ class PuppetXp extends PUPPET.Puppet {
  *
  */
   override async roomRawPayloadParser (payload: PUPPET.payloads.Room) { return payload }
-  override async roomRawPayload (id: string): Promise<PUPPET.payloads.Room> {
+  override async roomRawPayload (id: string): Promise<PUPPET.payloads.Room|undefined> {
+    // log.info('PuppetXp', 'roomRawPayload(%s)', id)
     //  log.verbose('PuppetXp----------------------', 'roomRawPayload(%s%s)', id, this.roomStore[id]?.topic)
-    if (this.roomStore[id]) {
-      return this.roomStore[id] || {} as any
-    } else {
-      const room: PUPPET.payloads.Room = {
-        adminIdList: [],
-        id,
-        memberIdList: [],
-        topic: 'Unknown Room Topic',
-      }
-      return room
-    }
+    return this.roomStore[id]
   }
 
   override async roomList (): Promise<string[]> {
@@ -1110,8 +1114,8 @@ class PuppetXp extends PUPPET.Puppet {
     log.verbose('PuppetXp', 'roomMemberList(%s)', roomId)
     try {
       const roomRawPayload = await this.roomRawPayload(roomId)
-      const memberIdList = roomRawPayload.memberIdList
-      return memberIdList
+      const memberIdList = roomRawPayload?.memberIdList
+      return memberIdList || []
     } catch (e) {
       log.error('roomMemberList()', e)
       return []

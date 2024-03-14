@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys */
 /**
  * Wechaty - Conversational RPA SDK for Chatbot Makers.
  *  - https://github.com/wechaty/wechaty
@@ -39,6 +40,15 @@ async function onLogin (user: Contact) {
   log.info('联系人数量：', contactList.length)
   const friends = contactList.filter(c => c.friend())
   log.info('好友数量：', friends.length)
+
+  // 发送@好友消息
+  const room = await bot.Room.find({ topic:'大师是群主' })
+  const contact = await bot.Contact.find({ name:'luyuchao' })
+  log.info('room：', room)
+  if (room && contact) {
+    const contacts:Contact[] = [ contact ]
+    await room.say(new Date().toLocaleString() + '：瓦力上线了！', ...contacts)
+  }
 }
 
 function onLogout (user: Contact) {
@@ -47,10 +57,11 @@ function onLogout (user: Contact) {
 
 async function onMessage (msg: Message) {
   // log.info('onMessage', msg.toString())
+  log.info('接收到消息：', JSON.stringify(msg))
   const contact = msg.talker()
   log.info('当前联系人信息：', JSON.stringify(contact))
   const room = msg.room()
-  if(room){
+  if (room) {
     log.info('当前群信息：', await room.topic())
     log.info('当前群群主：', JSON.stringify(room.owner()))
   }
@@ -98,10 +109,15 @@ async function onMessage (msg: Message) {
 
   try {
     if (msg.type() === types.Message.Image || msg.type() === types.Message.Attachment || msg.type() === types.Message.Video || msg.type() === types.Message.Audio || msg.type() === types.Message.Emoticon) {
-      const file = await msg.toFileBox()  // Save the media message as a FileBox
+      const file = await msg.toImage().thumbnail()  // Save the media message as a FileBox
+
       const filePath = 'examples/file/' + file.name
-      file.toFile(filePath)
-      log.info(`Saved file: ${filePath}`)
+      try {
+        await file.toFile(filePath, true)
+        log.info(`Saved file: ${filePath}`)
+      } catch (e) {
+        log.error('保存文件错误：', e)
+      }
     } else {
       // Log other non-text messages
       const logData = {
@@ -124,7 +140,7 @@ async function onMessage (msg: Message) {
 
 }
 
-const puppet = new PuppetXp({wechatVersion:'5.0.0.0'})
+const puppet = new PuppetXp({ wechatVersion:'0.0.0.0' })
 const bot = WechatyBuilder.build({
   name: 'ding-dong-bot',
   puppet,
@@ -134,9 +150,6 @@ bot.on('scan', onScan)
 bot.on('login', onLogin)
 bot.on('logout', onLogout)
 bot.on('message', onMessage)
-bot.on('heartbeat', (data)=>{
-  console.info(data)
-})
 bot.on('room-join', async (room, inviteeList, inviter) => {
   const nameList = inviteeList.map(c => c.name()).join(',')
   log.info(`Room ${await room.topic()} got new member ${nameList}, invited by ${inviter}`)
