@@ -10,7 +10,6 @@
  */
 
 // https://blog.csdn.net/iloveitvm/article/details/109119687  frida学习
-
 // 偏移地址,来自于wxhelper项目
 const wxOffsets = {
   shareRecordMgr: {
@@ -94,8 +93,8 @@ const wxOffsets = {
     WX_NEW_ADD_FRIEND_HELPER_OFFSET: 0xa17d50,
     WX_FREE_ADD_FRIEND_HELPER_OFFSET: 0xa17e70,
     WX_MOD_REMARK_OFFSET: 0xbfd5e0,
-    WX_HEAD_IMAGE_MGR_OFFSET:0x807b00,
-    QUERY_THEN_DOWNLOAD_OFFSET:0xc63470
+    WX_HEAD_IMAGE_MGR_OFFSET: 0x807b00,
+    QUERY_THEN_DOWNLOAD_OFFSET: 0xc63470
   },
   pushAttachTask: {
     WX_PUSH_ATTACH_TASK_OFFSET: 0x82bb40,
@@ -148,11 +147,26 @@ const wxOffsets = {
   sendText: {
     WX_SEND_TEXT_OFFSET: 0xCE6C80,
   },
-  sendLink:{
-    NEW_MM_READ_ITEM_OFFSET:0x76e630,
- FREE_MM_READ_ITEM_OFFSET:  0x76da30,
- FREE_MM_READ_ITEM_2_OFFSET:  0x76e350,
- FORWARD_PUBLIC_MSG_OFFSET:  0xb73000
+  sendLink: {
+    NEW_MM_READ_ITEM_OFFSET: 0x76e630,
+    FREE_MM_READ_ITEM_OFFSET: 0x76da30,
+    FREE_MM_READ_ITEM_2_OFFSET: 0x76e350,
+    FORWARD_PUBLIC_MSG_OFFSET: 0xb73000
+  },
+  sendApp: {
+    // send app msg
+    // #define NEW_SHARE_APP_MSG_REQ_OFFSET 0xfb9890
+    NEW_SHARE_APP_MSG_REQ_OFFSET: 0xfb9890,
+    // #define FREE_SHARE_APP_MSG_REQ_OFFSET 0xfbc0d0
+    FREE_SHARE_APP_MSG_REQ_OFFSET: 0xfbc0d0,
+    // #define FREE_SHARE_APP_MSG_REQ_OFFSET 0xfbab40
+    NEW_SHARE_APP_MSG_INFO_OFFSET: 0xfbab40,
+    // #define NEW_WA_UPDATABLE_MSG_INFO_OFFSET 0x7b3290
+    NEW_WA_UPDATABLE_MSG_INFO_OFFSET: 0x7b3290,
+    // #define FREE_WA_UPDATABLE_MSG_INFO_OFFSET 0x79ca10
+    FREE_WA_UPDATABLE_MSG_INFO_OFFSET: 0x79ca10,
+    // #define SEND_APP_MSG_OFFSET 0xfe7840
+    SEND_APP_MSG_OFFSET: 0xfe7840,
   },
   // ocr
   ocr: {
@@ -226,8 +240,8 @@ const moduleLoad = Module.load('WeChatWin.dll')
 // console.log('moduleBaseAddress:', moduleBaseAddress)
 
 /* -----------------base------------------------- */
-let retidPtr:any=null
-let retidStruct:any=null
+let retidPtr: any = null
+let retidStruct: any = null
 const initidStruct = ((str) => {
 
   retidPtr = Memory.alloc(str.length * 2 + 1)
@@ -384,13 +398,30 @@ const checkSupportedFunction = () => {
   return ver === availableVersion
 }
 
-// 检查是否已登录—
+// 检查是否已登录——done,2024-03-14，call和实现方法来源于ttttupup/wxhelper项目
+const checkLogin = () => {
+  let success = -1;
+  const accout_service_addr = moduleBaseAddress.add(wxOffsets.login.WX_ACCOUNT_SERVICE_OFFSET);
+  // 创建原生函数对象，此处假设该函数返回'pointer'并且不需要输入参数
+  let getAccountService = new NativeFunction(accout_service_addr, 'pointer', []);
+  // 调用原生函数并获取服务地址
+  let service_addr = getAccountService();
+  // 判断服务地址是否有效
+  if (!service_addr.isNull()) {
+    // 成功获取账户服务地址，现在访问0x4E0偏移的值
+    // 注意：针对返回的地址，必须使用正确的类型，这里假设它是DWORD
+    success = service_addr.add(0x4E0).readU32();
+  }
+  // 返回获得的状态值
+  return success;
+}
+
+// 检查是否已登录
 const isLoggedInFunction = () => {
   let success = -1
   const accout_service_addr = moduleBaseAddress.add(wxOffsets.login.WX_ACCOUNT_SERVICE_OFFSET)
   const callFunction = new NativeFunction(accout_service_addr, 'pointer', [])
   const service_addr = callFunction()
-
   // console.log('service_addr:', service_addr)
 
   try {
@@ -402,8 +433,6 @@ const isLoggedInFunction = () => {
     throw new Error(e)
   }
   // console.log('isLoggedInFunction结果:', success)
-  // 813746031、813746031、813746031
-  // console.log('isLoggedInFunction结果=======:', success)
   return success
 }
 
@@ -669,45 +698,41 @@ const getContactNativeFunction = (): string => {
 // 设置联系人备注——done,2024-03-13，call和实现方法来源于ttttupup/wxhelper项目
 const modifyContactRemarkFunction = (contactId: string, text: string) => {
 
+  // int success = -1;
+  const successPtr = Memory.alloc(4);
+  successPtr.writeS32(-1)
+
+  // WeChatString contact(wxid);
+  const contactPtr: any = initidStruct(contactId);
+  // WeChatString content(remark);
+  const contentPtr: any = initStruct(text);
+  // DWORD mod__addr = base_addr_ + WX_MOD_REMARK_OFFSET;
+  const mod__addr = moduleBaseAddress.add(
+    wxOffsets.contact.WX_MOD_REMARK_OFFSET,
+  );
+
   const txtAsm: any = Memory.alloc(Process.pageSize)
-
-  const wxidPtr: any = Memory.alloc(contactId.length * 2 + 2)
-  wxidPtr.writeUtf16String(contactId)
-
-  const picWxid = Memory.alloc(0x0c)
-  picWxid.writePointer(ptr(wxidPtr)).add(0x04)
-    .writeU32(contactId.length * 2).add(0x04)
-    .writeU32(contactId.length * 2).add(0x04)
-
-  const contentPtr = Memory.alloc(text.length * 2 + 2)
-  contentPtr.writeUtf16String(text)
-
-  const sizeOfStringStruct = Process.pointerSize * 5
-  const contentStruct = Memory.alloc(sizeOfStringStruct)
-
-  contentStruct
-    .writePointer(contentPtr).add(0x4)
-    .writeU32(text.length).add(0x4)
-    .writeU32(text.length * 2)
-
-  // const ecxBuffer = Memory.alloc(0x2d8)
-
   Memory.patchCode(txtAsm, Process.pageSize, code => {
     const writer = new X86Writer(code, {
       pc: txtAsm,
     })
-
+    //     PUSHAD
+    //     PUSHFD
     writer.putPushfx();
     writer.putPushax();
-    writer.putMovRegAddress('eax', contentStruct);
+    //     LEA        EAX,content
+    writer.putMovRegAddress('eax', contentPtr);
+    //     PUSH       EAX
     writer.putPushReg('eax');
-    writer.putMovRegAddress('eax', picWxid);
-    // writer.putMovRegAddress('ecx', ecxBuffer)
+    //     LEA        EAX,contact
+    writer.putMovRegAddress('eax', contactPtr);
+    //     PUSH       EAX
     writer.putPushReg('eax');
-    writer.putCallAddress(moduleBaseAddress.add(
-      wxOffsets.contact.WX_MOD_REMARK_OFFSET,
-    ));
-    // writer.putAddRegImm('esp', 0x18);
+    //     CALL       mod__addr   
+    writer.putCallAddress(mod__addr);
+    writer.putMovNearPtrReg(successPtr, 'eax')
+    //     POPFD
+    //     POPAD
     writer.putPopax();
     writer.putPopfx();
     writer.putRet()
@@ -717,11 +742,16 @@ const modifyContactRemarkFunction = (contactId: string, text: string) => {
 
   // console.log('----------txtAsm', txtAsm)
   const nativeativeFunction = new NativeFunction(ptr(txtAsm), 'void', [])
-  nativeativeFunction()
+  try {
+    nativeativeFunction()
+    console.log('[设置联系人备注] successPtr:', successPtr.readS32())
+  } catch (e) {
+    log.error('[设置联系人备注]Error:', e)
+  }
 
 }
 // 示例调用
-// modifyContactRemarkFunction("tyutluyc", "超哥xxxxx");
+// modifyContactRemarkFunction("ledongmao", "超哥xxxxx");
 
 // 获取联系人头像——待测试，2024-03-13，call和实现方法来源于ttttupup/wxhelper项目
 const getHeadImage = (contactId: string, url: string) => {
@@ -811,10 +841,10 @@ const addFriendByWxid = (contactId: string, text: string) => {
   // const ecxBuffer = Memory.alloc(0x2d8)
 
   let success = -1;
-  const contact_mgr_addr = moduleBaseAddress.add(wxOffsets.contactMgr.WX_CONTACT_MGR_OFFSET) ;
+  const contact_mgr_addr = moduleBaseAddress.add(wxOffsets.contactMgr.WX_CONTACT_MGR_OFFSET);
   const verify_msg_addr = moduleBaseAddress.add(wxOffsets.contact.WX_VERIFY_MSG_OFFSET);
-  const set_value_addr =  moduleBaseAddress.add(wxOffsets.setChatMsgValue.WX_INIT_CHAT_MSG_OFFSET);
-  const do_verify_user_addr = moduleBaseAddress.add(wxOffsets.contact.WX_DO_VERIFY_USER_OFFSET) ;
+  const set_value_addr = moduleBaseAddress.add(wxOffsets.setChatMsgValue.WX_INIT_CHAT_MSG_OFFSET);
+  const do_verify_user_addr = moduleBaseAddress.add(wxOffsets.contact.WX_DO_VERIFY_USER_OFFSET);
   const fn1_addr = moduleBaseAddress.add(0x7591b0);
 
   // 创建未知结构体null_obj，并初始化
@@ -832,33 +862,33 @@ const addFriendByWxid = (contactId: string, text: string) => {
     writer.putPushfx();
     writer.putPushax();
 
-        // 调用contact_mgr_addr函数获取实例
-        writer.putCallAddress(contact_mgr_addr);
+    // 调用contact_mgr_addr函数获取实例
+    writer.putCallAddress(contact_mgr_addr);
 
-        // 根据C++代码逻辑设置EDI, ESI和其他参数
-        // 注意：这部分逻辑可能需要根据实际情况调整
-        writer.putSubRegImm('edi', 0xE);
-        writer.putSubRegImm('esi', 0x8);
-        
-        // 这里使用临时栈空间的逻辑需要特别注意，因为在Frida中直接操作ESP可能不是最佳实践
-        // 如果fn1_addr函数对ESP的操作是必需的，那么需要确保在Frida脚本中正确模拟
-        // 可能需要创建一个足够大的buffer来模拟这部分内存操作，而不是直接操作ESP
-    
-        // 调用fn1_addr函数
-        writer.putCallAddress(fn1_addr);
-    
-        // 准备verify_msg_addr函数的参数
-        writer.putMovRegAddress('eax', w_msg);
-        writer.putPushReg('eax');
-        writer.putCallAddress(verify_msg_addr);
-    
-        // 准备set_value_addr函数的参数
-        writer.putMovRegPtrReg('eax', wxidPtr);
-        writer.putPushReg('eax');
-        writer.putCallAddress(set_value_addr);
-    
-        // 调用do_verify_user_addr函数
-        writer.putCallAddress(do_verify_user_addr);
+    // 根据C++代码逻辑设置EDI, ESI和其他参数
+    // 注意：这部分逻辑可能需要根据实际情况调整
+    writer.putSubRegImm('edi', 0xE);
+    writer.putSubRegImm('esi', 0x8);
+
+    // 这里使用临时栈空间的逻辑需要特别注意，因为在Frida中直接操作ESP可能不是最佳实践
+    // 如果fn1_addr函数对ESP的操作是必需的，那么需要确保在Frida脚本中正确模拟
+    // 可能需要创建一个足够大的buffer来模拟这部分内存操作，而不是直接操作ESP
+
+    // 调用fn1_addr函数
+    writer.putCallAddress(fn1_addr);
+
+    // 准备verify_msg_addr函数的参数
+    writer.putMovRegAddress('eax', w_msg);
+    writer.putPushReg('eax');
+    writer.putCallAddress(verify_msg_addr);
+
+    // 准备set_value_addr函数的参数
+    writer.putMovRegPtrReg('eax', wxidPtr);
+    writer.putPushReg('eax');
+    writer.putCallAddress(set_value_addr);
+
+    // 调用do_verify_user_addr函数
+    writer.putCallAddress(do_verify_user_addr);
 
     // POPFD         
     // POPAD
@@ -879,7 +909,7 @@ const addFriendByWxid = (contactId: string, text: string) => {
   }
 
 }
-// addFriendByWxid('tyutluyc', 'hello')
+// addFriendByWxid('ledongmao', 'hello')
 
 // 获取群组列表
 const getChatroomMemberInfoFunction = () => {
@@ -1037,7 +1067,7 @@ const delMemberFromChatRoom = (chat_room_id: string, wxids: string[]) => {
     writer.putPushReg('eax');
     console.log('del_member_addr:', del_member_addr)
     writer.putCallAddress(del_member_addr);
-    
+
     console.log('putPopax:', 'putPopax')
     writer.putPopax();
     writer.putPopfx();
@@ -1060,7 +1090,7 @@ const delMemberFromChatRoom = (chat_room_id: string, wxids: string[]) => {
   }
 
 }
-// delMemberFromChatRoom('21341182572@chatroom', ['tyutluyc'])
+// delMemberFromChatRoom('21341182572@chatroom', ['ledongmao'])
 
 // 未完成，添加群成员
 const addMemberToChatRoom = (chat_room_id, wxids) => {
@@ -1264,15 +1294,15 @@ const sendMsgNativeFunction = (talkerId: any, content: any) => {
 }
 
 // 发送@消息
-let asmAtMsg:any = null
+let asmAtMsg: any = null
 let roomid_, msg_, wxid_, atid_
 let ecxBuffer
-const sendAtMsgNativeFunction = ((roomId, text, contactId,nickname) => {
+const sendAtMsgNativeFunction = ((roomId, text, contactId, nickname) => {
   // console.log('Function called with roomId:', roomId, 'text:', text, 'contactId:', contactId, 'nickname:', nickname)
   asmAtMsg = Memory.alloc(Process.pageSize)
   ecxBuffer = Memory.alloc(0x3b0)
   // console.log('xxxx', text.indexOf('@'+nickname))
-  const atContent = text.indexOf('@'+nickname)!==-1? text:('@'+nickname+' '+text) 
+  const atContent = text.indexOf('@' + nickname) !== -1 ? text : ('@' + nickname + ' ' + text)
 
   roomid_ = initStruct(roomId)
   wxid_ = initidStruct(contactId)
@@ -1429,25 +1459,25 @@ function sendLinkMsgNativeFunction(wxid, title, url, thumburl, senderId, senderN
   buff.add(0x1B4).writePointer(wName);
 
   // 调用其他函数完成消息的转发
-try {
-  const appMsgMgr = new NativeFunction(appMsgMgrAddr, 'pointer', [])();
-  const initChatMsg = new NativeFunction(initChatMsgAddr, 'void', ['pointer', 'pointer']);
-  initChatMsg(buff, toUser);
+  try {
+    const appMsgMgr = new NativeFunction(appMsgMgrAddr, 'pointer', [])();
+    const initChatMsg = new NativeFunction(initChatMsgAddr, 'void', ['pointer', 'pointer']);
+    initChatMsg(buff, toUser);
 
-  const forwardPublicMsg = new NativeFunction(forwardPublicMsgAddr, 'int', ['pointer']);
-  success = forwardPublicMsg(appMsgMgr);
+    const forwardPublicMsg = new NativeFunction(forwardPublicMsgAddr, 'int', ['pointer']);
+    success = forwardPublicMsg(appMsgMgr);
 
-  const freeItem2 = new NativeFunction(freeItem2Addr, 'void', ['pointer', 'int']);
-  freeItem2(buff, 0);
-} catch (e) {
-  console.error('Error during sendLinkMsgNativeFunction function execution:', e);
-  return false;
-}
+    const freeItem2 = new NativeFunction(freeItem2Addr, 'void', ['pointer', 'int']);
+    freeItem2(buff, 0);
+  } catch (e) {
+    console.error('Error during sendLinkMsgNativeFunction function execution:', e);
+    return false;
+  }
 
   return success;
 }
 
-// sendLinkMsgNativeFunction('tyutluyc', '标题是测试', 'https://www.json.cn', 'C:\\Users\\tyutl\\Documents\\GitHub\\puppet-xp\\examples\\file\\message-cltngju1k0030wko48uiwa2qs-url-1.jpg', 'tyutluyc', '超哥', '这是描述...')
+// sendLinkMsgNativeFunction('ledongmao', '标题是测试', 'https://www.json.cn', 'C:\\Users\\tyutl\\Documents\\GitHub\\puppet-xp\\examples\\file\\message-cltngju1k0030wko48uiwa2qs-url-1.jpg', 'ledongmao', '超哥', '这是描述...')
 
 // 接收消息回调
 const recvMsgNativeCallback = (() => {
