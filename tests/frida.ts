@@ -2,7 +2,7 @@
 
 // 偏移地址,来自于wxhelper项目
 const testRoom = '25172281579@chatroom'
-const testContact = 'tyutluyc'
+const testContact = 'ledongmao'
 
 const log = {
   info: (a: any, b?: any) => {

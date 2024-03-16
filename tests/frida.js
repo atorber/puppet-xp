@@ -1,7 +1,7 @@
 // frida -n WeChat.exe -l frida.js
 // 偏移地址,来自于wxhelper项目
 var testRoom = '25172281579@chatroom';
-var testContact = 'tyutluyc';
+var testContact = 'ledongmao';
 var log = {
     info: function (a, b) {
         b = b || '';
