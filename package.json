@@ -109,7 +109,7 @@
   },
   "git": {
     "scripts": {
-      "pre-push": "node scripts/git-pre-push.js"
+      "pre-push": "node scripts/git-pre-push.cjs"
     }
   }
 }
