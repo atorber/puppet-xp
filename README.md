@@ -65,29 +65,37 @@ XP is a young puppet, it keeps growing and improving.
 :---|:---|:---|:---|:---|
 **<消息>**|
 接收文本|✅|✅|✅|✅
-接收图片|✅|✅|✅
-接收文件|✅|✅|✅|✅
-接收动图|✅|✅|✅|✅
+接收图片|✅|✅|✅|
+接收文件|✅|✅|✅|✅*
+接收动图|✅|✅|✅|
 接收表情|✅|✅|✅|✅
-接收小程序卡片|✅|✅|✅
-接收联系人卡片|✅|✅|✅
-接收位置卡片|✅|✅|✅
+接收小程序卡片|✅|✅|✅|
+接收联系人卡片|✅|✅|✅|
+接收位置卡片|✅|✅|✅|
 发送文本|✅|✅|✅|✅
-发送图片|✅|✅|✅
-发送文件|✅|✅|✅
-发送动图|✅|✅|✅
+发送图片|✅|✅|✅|
+发送文件|✅|✅|✅|
+发送动图|✅|✅|✅|
 **<群组>**|
-@群成员|✅|✅|✅
+@群成员|✅|✅|✅|
 群列表|✅|✅|✅|✅
-群成员列表|✅|✅|✅
-群详情|✅|✅|✅
-进群提示|✅|✅|✅
+群成员列表|✅|✅|✅|
+群详情|✅|✅|✅|
+进群提示|✅|✅|✅|
 **<联系人>**|
 好友列表|✅|✅|✅|✅
-好友详情|✅|✅|✅
+好友详情|✅|✅|✅|
 **<其他>**|
 登录事件|✅|✅|✅|✅
-扫码登录|||✅
+扫码登录|||✅|
+
+> Notes for **3.9.10.27** (aligned with current agent / sidecar):
+>
+> - Confirmed: 登录事件、接收/发送文本、好友列表、群列表、接收表情。
+> - `*` 接收文件：可收到消息事件并解析路径；文件落盘完整性依赖客户端，未单独保证。
+> - 接收图片：消息事件与解密逻辑存在，但 3.9.10.27 路径/稳定性未充分验证，故暂不标 ✅。
+> - 接收动图：无独立通道（多与表情同类型），故不单独标 ✅。
+> - 发送图片/文件/动图、@群成员、群成员列表/详情、扫码登录：当前未实现或为空实现。
 
 ## VERSION SUPPORT
 
@@ -95,7 +103,7 @@ Note: You need to install an NPM / repo version that matches your WeChat client 
 
 | puppet-xp | WeChat | npm install |
 |:---|:---|:---|
-| 2.2.1 (latest) | [WeChat-v3.9.10.27](https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.9.10.27/WeChatSetup-3.9.10.27.exe) | `npm i wechaty-puppet-xp@2.2.1` |
+| 2.2.2 (latest) | [WeChat-v3.9.10.27](https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.9.10.27/WeChatSetup-3.9.10.27.exe) | `npm i wechaty-puppet-xp@2.2.2` |
 | 2.1.1 | [WeChat-v3.9.10.27](https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.9.10.27/WeChatSetup-3.9.10.27.exe) | `npm i wechaty-puppet-xp@2.1.1` |
 | 1.13.12 | [WeChat-v3.9.2.23](https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.9.2.23/WeChatSetup-3.9.2.23.exe) | `npm i wechaty-puppet-xp@1.13.12` |
 | 1.12.7 | [WeChat-v3.6.0.18](https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.6.0.18/WeChatSetup-3.6.0.18.exe) | `npm i wechaty-puppet-xp@1.12.7` |
@@ -107,7 +115,7 @@ Note: You need to install an NPM / repo version that matches your WeChat client 
 
 本项目依赖 Frida Hook，**微信客户端版本必须与 puppet-xp 版本对应**，见上方 [VERSION SUPPORT](#version-support)。
 
-- 微信 `3.9.10.27` → 使用本仓库当前代码 / `wechaty-puppet-xp@2.2.1`（或 `2.1.1+`）
+- 微信 `3.9.10.27` → 使用本仓库当前代码 / `wechaty-puppet-xp@2.2.2`（或 `2.1.1+`）
 - 启动前请先打开并登录对应版本的微信
 
 ### 2. `nvm use` 后 `node -v` 仍是旧版本（Windows）
@@ -203,6 +211,10 @@ node --input-type=module -e "import { createRequire } from 'module'; import { pa
 请安装 [Git for Windows](https://git-scm.com/download/win)，或设置 `GIT_BASH` 指向 `bash.exe`。
 
 ## HISTORY
+
+### v2.2.2
+
+1. Docs: align PUPPET COMPARISON for WeChat 3.9.10.27 with actual sidecar/agent support
 
 ### v2.2.1
 
