@@ -193,12 +193,12 @@ node -e "const frida=require('frida'); const {execSync}=require('child_process')
 
 ### 7. `git push` 失败：`ambiguous argument 'HEAD0'`（Windows）
 
-`@chatie/git-scripts` 的 pre-push 本身没问题，它会执行 `git log ... HEAD^0`。  
-失败原因是：hook 内通过 `shelljs` 调 git 时，在 Windows `cmd.exe` 下 `^` 被当成转义符，`HEAD^0` 变成了 `HEAD0`。
+`@chatie/git-scripts` 的 pre-push 逻辑没有问题，命令是 `git log ... HEAD^0`。  
+失败原因是：hook 通过 `shelljs` 调用 git 时，在 Windows 默认走 `cmd.exe`，`^` 被当成转义符，`HEAD^0` 变成了 `HEAD0`。
 
-处理：本仓库用 `scripts/git-pre-push.js` **包装**原 hook，在 Windows 上强制用 Git Bash 作为 `child_process` 的 shell，再执行 `@chatie/git-scripts` 原逻辑（不改 hook 行为）。
+处理：`scripts/git-pre-push.js` 在调用原 hook 前，为 `shelljs.exec` 注入 Git Bash 作为 `shell`（不改 `@chatie/git-scripts` 行为）。
 
-请确认已安装 [Git for Windows](https://git-scm.com/download/win)，或设置环境变量 `GIT_BASH` 指向 `bash.exe`。
+请安装 [Git for Windows](https://git-scm.com/download/win)，或设置 `GIT_BASH` 指向 `bash.exe`。
 
 ## HISTORY
 
