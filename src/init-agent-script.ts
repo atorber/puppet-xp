@@ -746,7 +746,7 @@ const modifyContactRemarkFunction = (contactId: string, text: string) => {
     nativeativeFunction()
     console.log('[设置联系人备注] successPtr:', successPtr.readS32())
   } catch (e) {
-    log.error('[设置联系人备注]Error:', e)
+    console.error('[设置联系人备注]Error:', e)
   }
 
 }

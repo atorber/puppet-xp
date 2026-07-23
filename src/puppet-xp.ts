@@ -75,6 +75,9 @@ class PuppetXp extends PUPPET.Puppet {
 
   private isReady = false
 
+  /** Deduplicate concurrent onLogin() from onStart + loginEvent hook. */
+  private loginPromise?: Promise<void>
+
   #sidecar?: WeChatSidecar
   protected get sidecar (): WeChatSidecar {
     return this.#sidecar!
@@ -111,8 +114,6 @@ class PuppetXp extends PUPPET.Puppet {
     this.#sidecar = new WeChatSidecar()
 
     await attach(this.sidecar)
-    // await this.onLogin()
-    await this.onAgentReady()
 
     this.sidecar.on('hook', ({ method, args }) => {
       log.verbose('PuppetXp', 'onHook(%s, %s)', method, JSON.stringify(args))
@@ -148,6 +149,19 @@ class PuppetXp extends PUPPET.Puppet {
       }
     })
 
+    // WeChat already logged in: finish puppet login before handling messages.
+    // Avoid racing recvMsg -> currentUserId before __currentUserId is set.
+    try {
+      const loggedIn = await this.sidecar.isLoggedIn()
+      if (Number(loggedIn) === 1 || loggedIn === true) {
+        await this.onLogin()
+      }
+    } catch (e) {
+      log.warn('PuppetXp', 'onStart() check isLoggedIn failed: %s', e)
+    }
+
+    await this.onAgentReady()
+
   }
 
   private async onAgentReady () {
@@ -162,8 +176,16 @@ class PuppetXp extends PUPPET.Puppet {
   }
 
   private async onLogin () {
-    // log.info('onLogin：', this.isLoggedIn)
-    if (!this.isLoggedIn) {
+    if (this.isLoggedIn) {
+      log.info('已处于登录状态，无需再次登录')
+      return
+    }
+    if (this.loginPromise) {
+      await this.loginPromise
+      return
+    }
+
+    this.loginPromise = (async () => {
       const selfInfoRaw = JSON.parse(await this.sidecar.getMyselfInfo())
       // log.debug('selfInfoRaw:\n\n\n', selfInfoRaw)
       const selfInfo: PUPPET.payloads.Contact = {
@@ -183,9 +205,15 @@ class PuppetXp extends PUPPET.Puppet {
       // 初始化群列表
       await this.loadRoomList()
       // 初始化机器人信息
-      await super.login(this.selfInfo.id)
-    } else {
-      log.info('已处于登录状态，无需再次登录')
+      if (!this.isLoggedIn) {
+        await super.login(this.selfInfo.id)
+      }
+    })()
+
+    try {
+      await this.loginPromise
+    } finally {
+      this.loginPromise = undefined
     }
   }
 
@@ -238,6 +266,11 @@ class PuppetXp extends PUPPET.Puppet {
   }
 
   private onHookRecvMsg (args: any) {
+    // Do not touch currentUserId before login completes (throws in wechaty-puppet).
+    if (!this.isLoggedIn) {
+      log.verbose('PuppetXp', 'onHookRecvMsg() skipped: not logged in yet, args=%s', JSON.stringify(args))
+      return
+    }
     // log.info('onHookRecvMsg', JSON.stringify(args))
     let type = PUPPET.types.Message.Unknown
     let roomId = ''

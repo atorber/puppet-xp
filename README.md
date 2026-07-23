@@ -13,7 +13,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/wechaty/wechaty-puppet-xp.svg?label=github%20stars)](https://github.com/wechaty/wechaty)
 [![Gitter](https://badges.gitter.im/wechaty/wechaty.svg)](https://gitter.im/wechaty/wechaty?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-<img src="https://github.com/atorber/puppet-xp/assets/19552906/ac34b791-bfff-4beb-9631-088939d40465" alt="chatie puppet xp" width="300" height="300" align="bottom" />
+<img src="./docs/images/puppet-xp-logo.png" alt="chatie puppet xp" width="300" height="300" align="bottom" />
 
 - Official website: <https://wechaty.js.org/docs/puppet-providers/xp>
 - Join XP Discord: <https://discord.gg/uE8Tb77VBm>
@@ -22,30 +22,29 @@
 
 wechaty-puppet-xp is a local puppet for Wechaty:
 
-1. If you are a user of Windows,You can use this puppet to implement your chatbot.
-1. It's a completely free service and doesn't need token.
+1. If you are a user of Windows, you can use this puppet to implement your chatbot.
+2. It's a completely free service and doesn't need token.
 
 ## GETTING STARTED
 
-- STEP 1: Install wechat client in your Windows computer.
+- STEP 1: Install WeChat client on your Windows computer.
 
-> 1.13.0+ is the latest version, only support WeChat v3.9.2.23. Note to use the npm package that matches the WeChat version.
+> This branch (`1.13.12`) supports WeChat **v3.9.2.23**. Always install the npm / repo version that matches your WeChat client (see [VERSION SUPPORT](#version-support)). Recommended Node.js: **18 LTS**.
 
-- STEP 2: Login the wechat client on the computer.
+- STEP 2: Login the WeChat client on the computer.
 - STEP 3: Getting Started with TypeScript/JavaScript (RECOMMENDED).
 
 ```sh
+# Official upstream
 git clone https://github.com/wechaty/wechaty-puppet-xp.git
+# Or active development fork: https://github.com/atorber/puppet-xp.git
 cd wechaty-puppet-xp
 
-# 安装依赖
+# Install dependencies
 npm install
 
-# 启动程序
+# Start (WeChat must be installed with the required version and already logged in)
 npm start
-#
-# Do not forget to install WeChat with requried version and login.
-#
 ```
 
 | Run | Source code | Description |
@@ -54,13 +53,13 @@ npm start
 | `npm run start:ripe` | [examples/ripe-wechaty.ts](examples/ripe-wechaty.ts) | Wechaty ding/dong |
 | `npm run start:raw` | [examples/raw-sidecar.ts](examples/raw-sidecar.ts) | Sidecar ding/dong |
 
-## RUNNING WHITH NPM
+## RUNNING WITH NPM
 
-puppet-xp also have already released the installation package on NPM. Running with NPM and more examples can be referred to [wechaty-puppet-xp-getting-started](https://github.com/atorber/wechaty-puppet-xp-getting-started).
+puppet-xp is also published on NPM. Running with NPM and more examples: [wechaty-puppet-xp-getting-started](https://github.com/atorber/wechaty-puppet-xp-getting-started).
 
 ## PUPPET COMPARISON
 
-XP is a young puppet,it keeps growing and improving.
+XP is a young puppet, it keeps growing and improving.
 
 版本|3.3.0.115|3.6.0.18|3.9.2.23|
 :---|:---|:---|:---|
@@ -92,13 +91,81 @@ XP is a young puppet,it keeps growing and improving.
 
 ## VERSION SUPPORT
 
-Note: You need to install an NPM version that matches your WeChat client version.
+Note: You need to install an NPM / repo version that matches your WeChat client version.
 
-puppet-xp|wechat|npm install|
+| puppet-xp | WeChat | npm install |
 |:---|:---|:---|
-|1.3.x|[WeChat-v3.9.2.23](https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.9.2.23/WeChatSetup-3.9.2.23.exe)|npm i wechaty-puppet-xp@next|
-|1.12.7|[WeChat-v3.6.0.18](https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.6.0.18/WeChatSetup-3.6.0.18.exe)|npm i wechaty-puppet-xp@1.12.7|
-|1.11.14|[WeChat-v3.3.0.115](https://github.com/wechaty/wechaty-puppet-xp/releases/download/v0.5/WeChatSetup-v3.3.0.115.exe)|npm i wechaty-puppet-xp@1.11.14|
+| 1.13.12 (this branch) | [WeChat-v3.9.2.23](https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.9.2.23/WeChatSetup-3.9.2.23.exe) | `npm i wechaty-puppet-xp@1.13.12` |
+| 1.12.7 | [WeChat-v3.6.0.18](https://github.com/tom-snow/wechat-windows-versions/releases/download/v3.6.0.18/WeChatSetup-3.6.0.18.exe) | `npm i wechaty-puppet-xp@1.12.7` |
+| 1.11.14 | [WeChat-v3.3.0.115](https://github.com/wechaty/wechaty-puppet-xp/releases/download/v0.5/WeChatSetup-v3.3.0.115.exe) | `npm i wechaty-puppet-xp@1.11.14` |
+
+> For WeChat **v3.9.10.27**, use the `3.9.10.27` branch / `wechaty-puppet-xp@2.x` instead.
+
+## 常见问题 (FAQ)
+
+### 1. 微信版本与 npm 包版本不匹配
+
+本项目依赖 Frida Hook，**微信客户端版本必须与 puppet-xp 版本对应**，见上方 [VERSION SUPPORT](#version-support)。
+
+- 微信 `3.9.2.23` → 使用本仓库当前代码 / `wechaty-puppet-xp@1.13.12`
+- 启动前请先打开并登录对应版本的微信
+
+### 2. `nvm use` 后 `node -v` 仍是旧版本（Windows）
+
+常见原因：系统里同时安装了官方 Node（如 `C:\Program Files\nodejs`），且排在 PATH 前面，覆盖了 nvm 的 symlink。
+
+处理建议：
+
+1. 卸载官方 Node，或从用户/系统 PATH 中移除 `C:\Program Files\nodejs`
+2. 确认环境变量：
+   - `NVM_HOME` = nvm 安装目录（如 `%APPDATA%\nvm`）
+   - `NVM_SYMLINK` = `C:\Program Files (x86)\nodejs`
+3. **完全退出并重启终端 / Cursor**，再执行：
+
+```powershell
+nvm use 18.20.5
+node -v
+where.exe node
+```
+
+`where.exe node` 第一条应指向 nvm 的 symlink，而不是 `C:\Program Files\nodejs`。
+
+推荐使用 **Node.js 18 LTS**（如 `18.20.5`）安装与运行本项目。
+
+### 3. `npm install` 失败：`leveldown` / `node-gyp` / 找不到 Visual Studio
+
+原生模块编译需要 Windows C++ 构建环境。请安装 [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)，并勾选 **Desktop development with C++**。
+
+参考：<https://github.com/nodejs/node-gyp#on-windows>
+
+### 4. `Cannot find module 'bindings'` 或 `Could not locate the bindings file`（frida）
+
+说明 `frida` 依赖不完整，或原生 `.node` 文件未下载成功（常见于访问 GitHub 超时）。
+
+可尝试清理后重装 `frida`（版本以 `npm ls frida` 为准）。若直接 GitHub 超时，可改用镜像下载对应平台的预编译包，放到 `node_modules/frida/build/` 下对应路径。
+
+验证（本仓库 `"type": "module"`，验证时用 `createRequire`）：
+
+```powershell
+node --input-type=module -e "import { createRequire } from 'module'; import { pathToFileURL } from 'url'; const require = createRequire(pathToFileURL(process.cwd() + '/package.json')); console.log(require('frida/package.json').version); require('frida'); console.log('frida ok')"
+```
+
+### 5. `refused to load frida-agent, or terminated during injection`
+
+注入微信进程失败。常见排查：
+
+1. 微信已启动并已登录，版本与 puppet 匹配（本分支为 `3.9.2.23`）
+2. 关闭或排除 Windows Defender 对项目目录 / Frida 的拦截后重试
+3. 必要时以管理员权限运行终端再执行 `npm start`
+4. 部分环境（含 Windows on ARM）上较旧的 Frida 15.x 可能无法注入，可尝试将 `frida` 升级到 `16.7.10` 后重试（`npm ls frida` 确认实际版本）
+
+### 6. `npm start` 一直停在 `Please wait... I'm trying to login in...`
+
+优先检查：
+
+1. 微信是否已打开并登录
+2. 微信版本是否为 `3.9.2.23`（见 VERSION SUPPORT）
+3. Frida 能否 attach 到 `WeChat.exe`
 
 ## HISTORY
 
@@ -146,18 +213,18 @@ Support room.say(text, ...mentionList), you can at RoomMember.
 ### v0.4 (Aug 9, 2021)
 
 1. Added some support for classes Contact and Room
-1. Support bot.Contact.findAll()/bot.Contact.find(query)
-1. Support bot.Room.findAll()/bot.Room.find(query)
+2. Support bot.Contact.findAll()/bot.Contact.find(query)
+3. Support bot.Room.findAll()/bot.Room.find(query)
 
 ### v0.2 (July 23, 2021)
 
 1. Code clean
-1. Fix all unit tests
-1. Run unit testings under Windows
-1. Deploy to NPM with GitHub actions
-1. [examples/ding-dong-bot.ts](examples/ding-dong-bot.ts) works on Windows!
-1. [examples/raw-sidecar.ts](examples/raw-sidecar.ts) works on Windows!
-1. [wechaty-getting-started](https://github.com/wechaty/wechaty-getting-started) supports `WECHATY_PUPPET=wechaty-puppet-xp` now.
+2. Fix all unit tests
+3. Run unit testings under Windows
+4. Deploy to NPM with GitHub actions
+5. [examples/ding-dong-bot.ts](examples/ding-dong-bot.ts) works on Windows!
+6. [examples/raw-sidecar.ts](examples/raw-sidecar.ts) works on Windows!
+7. [wechaty-getting-started](https://github.com/wechaty/wechaty-getting-started) supports `WECHATY_PUPPET=wechaty-puppet-xp` now.
 
 ### v0.0.1 (July 19, 2021)
 

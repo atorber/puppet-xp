@@ -140,7 +140,7 @@ async function onMessage (msg: Message) {
 
 }
 
-const puppet = new PuppetXp({ wechatVersion:'0.0.0.0' })
+const puppet = new PuppetXp({ wechatVersion: '3.9.2.23' })
 const bot = WechatyBuilder.build({
   name: 'ding-dong-bot',
   puppet,
