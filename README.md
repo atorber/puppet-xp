@@ -196,7 +196,7 @@ node -e "const frida=require('frida'); const {execSync}=require('child_process')
 `@chatie/git-scripts` 的 pre-push 逻辑没有问题，命令是 `git log ... HEAD^0`。  
 失败原因是：hook 通过 `shelljs` 调用 git 时，在 Windows 默认走 `cmd.exe`，`^` 被当成转义符，`HEAD^0` 变成了 `HEAD0`。
 
-处理：`scripts/git-pre-push.js` 在调用原 hook 前，为 `shelljs.exec` 注入 Git Bash 作为 `shell`（不改 `@chatie/git-scripts` 行为）。
+处理：`scripts/git-pre-push.cjs` 在调用原 hook 前，为 `shelljs.exec` 注入 Git Bash 作为 `shell`（不改 `@chatie/git-scripts` 行为）。
 
 请安装 [Git for Windows](https://git-scm.com/download/win)，或设置 `GIT_BASH` 指向 `bash.exe`。
 
