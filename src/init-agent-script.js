@@ -1,48 +1,11 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 /**
  * WeChat 3.9.10.27
  *
  */
-var _this = this;
 /* -----------------base------------------------- */
-var retidPtr = null;
-var retidStruct = null;
-var initidStruct = (function (str) {
+let retidPtr = null;
+let retidStruct = null;
+const initidStruct = ((str) => {
     retidPtr = Memory.alloc(str.length * 2 + 1);
     retidPtr.writeUtf16String(str);
     retidStruct = Memory.alloc(0x14); // returns a NativePointer
@@ -54,9 +17,9 @@ var initidStruct = (function (str) {
         .writeU32(0);
     return retidStruct;
 });
-var retPtr = null;
-var retStruct = null;
-var initStruct = (function (str) {
+let retPtr = null;
+let retStruct = null;
+const initStruct = ((str) => {
     retPtr = Memory.alloc(str.length * 2 + 1);
     retPtr.writeUtf16String(str);
     retStruct = Memory.alloc(0x14); // returns a NativePointer
@@ -68,9 +31,9 @@ var initStruct = (function (str) {
         .writeU32(0);
     return retStruct;
 });
-var msgstrPtr = null;
-var msgStruct = null;
-var initmsgStruct = function (str) {
+let msgstrPtr = null;
+let msgStruct = null;
+const initmsgStruct = (str) => {
     msgstrPtr = Memory.alloc(str.length * 2 + 1);
     msgstrPtr.writeUtf16String(str);
     msgStruct = Memory.alloc(0x14); // returns a NativePointer
@@ -82,8 +45,8 @@ var initmsgStruct = function (str) {
         .writeU32(0);
     return msgStruct;
 };
-var atStruct = null;
-var initAtMsgStruct = function (wxidStruct) {
+let atStruct = null;
+const initAtMsgStruct = (wxidStruct) => {
     atStruct = Memory.alloc(0x10);
     atStruct.writePointer(wxidStruct).add(0x04)
         .writeU32(wxidStruct.toInt32() + 0x14).add(0x04) // 0x14 = sizeof(wxid structure)
@@ -91,10 +54,10 @@ var initAtMsgStruct = function (wxidStruct) {
         .writeU32(0);
     return atStruct;
 };
-var readStringPtr = function (address) {
-    var addr = ptr(address);
-    var size = addr.add(16).readU32();
-    var capacity = addr.add(20).readU32();
+const readStringPtr = (address) => {
+    const addr = ptr(address);
+    const size = addr.add(16).readU32();
+    const capacity = addr.add(20).readU32();
     addr.ptr = addr;
     addr.size = size;
     addr.capacity = capacity;
@@ -104,13 +67,13 @@ var readStringPtr = function (address) {
     addr.ptr._readCString = addr.ptr.readCString;
     addr.ptr._readAnsiString = addr.ptr.readAnsiString;
     addr.ptr._readUtf8String = addr.ptr.readUtf8String;
-    addr.readCString = function () {
+    addr.readCString = () => {
         return addr.size ? addr.ptr._readCString(addr.size) : '';
     };
-    addr.readAnsiString = function () {
+    addr.readAnsiString = () => {
         return addr.size ? addr.ptr._readAnsiString(addr.size) : '';
     };
-    addr.readUtf8String = function () {
+    addr.readUtf8String = () => {
         return addr.size ? addr.ptr._readUtf8String(addr.size) : '';
     };
     // console.log('readStringPtr() address:',address,' -> str ptr:', addr.ptr, 'size:', addr.size, 'capacity:', addr.capacity)
@@ -118,34 +81,34 @@ var readStringPtr = function (address) {
     // console.log('readStringPtr() address:', addr,'dump:', addr.readByteArray(24))
     return addr;
 };
-var readString = function (address) {
+const readString = (address) => {
     return readStringPtr(address).readUtf8String();
 };
-var readWideString = function (address) {
+const readWideString = (address) => {
     return readWStringPtr(address).readUtf16String();
 };
-var writeWStringPtr = function (str) {
+const writeWStringPtr = (str) => {
     // console.log(`输入字符串内容: ${str}`);
-    var strLength = str.length;
+    const strLength = str.length;
     // console.log(`字符串长度: ${strLength}`);
     // 计算UTF-16编码的字节长度（每个字符2个字节）
-    var utf16Length = strLength * 2;
+    const utf16Length = strLength * 2;
     // 计算我们需要为字符串对象结构分配的总内存空间，结构包含：指针 (Process.pointerSize) + 长度 (4 bytes) + 容量 (4 bytes)
-    var structureSize = Process.pointerSize + 4 + 4;
+    const structureSize = Process.pointerSize + 4 + 4;
     // 为字符串数据和结构体分配连续的内存空间
-    var totalSize = utf16Length + 2 + structureSize; // +2 用于 null 终止符
-    var basePointer = Memory.alloc(totalSize);
+    const totalSize = utf16Length + 2 + structureSize; // +2 用于 null 终止符
+    const basePointer = Memory.alloc(totalSize);
     // 将结构体指针定位到分配的内存起始位置
-    var structurePointer = basePointer;
+    const structurePointer = basePointer;
     // console.log(`字符串分配空间内存指针: ${structurePointer}`);
     // 将字符串数据指针定位到结构体之后的位置
-    var stringDataPointer = basePointer.add(structureSize);
+    const stringDataPointer = basePointer.add(structureSize);
     // console.log(`字符串保存地址指针: ${stringDataPointer}`);
     // 将 JavaScript 字符串转换成 UTF-16 编码格式，并写入分配的内存空间
     stringDataPointer.writeUtf16String(str);
     // console.log(`写入字符串到地址: ${stringDataPointer.readUtf16String()}`);
     // 检查分配的内存内容
-    var allocatedMemoryContent = stringDataPointer.readUtf16String();
+    const allocatedMemoryContent = stringDataPointer.readUtf16String();
     // console.log(`检查分配的内存内容: ${allocatedMemoryContent}`);
     // 在分配的内存空间中写入字符串对象的信息
     // 写入字符串数据指针
@@ -165,24 +128,23 @@ var writeWStringPtr = function (str) {
     // 返回分配的结构体表面的起始地址
     return structurePointer;
 };
-var readWStringPtr = function (addr) {
+const readWStringPtr = (addr) => {
     // console.log(`input读取字符串地址指针4: ${addr}`);
     // console.log(`读取字符串内容指针4: ${addr.readPointer().readUtf16String()}`);
-    var stringPointer = addr.readPointer();
+    const stringPointer = addr.readPointer();
     // console.log(`读取数据指针地址1: ${stringPointer}`);
     // console.log(`读取数据指针内容1: ${stringPointer.readUtf16String()}`);
-    var size = addr.add(Process.pointerSize).readU32();
+    const size = addr.add(Process.pointerSize).readU32();
     // console.log(`读取字符串长度: ${size}`);
-    var capacity = addr.add(Process.pointerSize + 4).readU32();
+    const capacity = addr.add(Process.pointerSize + 4).readU32();
     // console.log(`读取字符串容量: ${capacity}`);
     return {
         ptr: stringPointer,
         size: size,
         capacity: capacity,
-        readUtf16String: function () {
-            var _a;
+        readUtf16String: () => {
             // UTF-16字符串长度需要乘以2，因为每个字符占2个字节
-            var content = size ? (_a = stringPointer.readUtf16String()) === null || _a === void 0 ? void 0 : _a.replace(/\0+$/, '') : '';
+            const content = size ? stringPointer.readUtf16String()?.replace(/\0+$/, '') : '';
             // console.log(`读取字符串内容: ${content}`);
             return content;
         }
@@ -193,8 +155,8 @@ var readWStringPtr = function (addr) {
 //     size_t strLength = GET_DWORD(addr + 8);
 //     return strLength ? string(GET_STRING(addr), strLength) : string();
 // }
-var getStringByStrAddr = function (addr) {
-    var strLength = addr.add(8).readU32();
+const getStringByStrAddr = (addr) => {
+    const strLength = addr.add(8).readU32();
     // console.log('strLength:', strLength)
     return strLength ? addr.readPointer().readUtf16String(strLength) : '';
 };
@@ -207,7 +169,7 @@ function ReadWeChatStr(addr) {
         return "";
     var max_len = addr.add(0x18).readS64();
     // console.log("max_len: " + max_len);
-    var res = '';
+    let res = '';
     if ((max_len.or(0xF)).equals(0xF)) {
         res = addr.readUtf8String(len);
     }
@@ -225,14 +187,14 @@ function ReadSKBuiltinString(addr) {
     // if (inner_string.isNull()) return "";
     return ReadWeChatStr(inner_string);
 }
-var findIamgePathAddr = function (param2) {
-    var len = 0x180;
+const findIamgePathAddr = (param2) => {
+    const len = 0x180;
     console.log('param2:', param2);
     console.log('len:', len);
-    var path = '';
-    var isPath = false;
-    for (var i = 0; i < len; i++) {
-        var offset = (i + 1) + 0x280 * 0;
+    let path = '';
+    let isPath = false;
+    for (let i = 0; i < len; i++) {
+        const offset = (i + 1) + 0x280 * 0;
         console.log('offset:', offset);
         try {
             path = ReadSKBuiltinString(param2.add(offset).readS64()); // 发送者
@@ -260,7 +222,7 @@ var findIamgePathAddr = function (param2) {
         }
     }
 };
-var hasPath = function (path) {
+const hasPath = (path) => {
     // return path.indexOf('Thumb') !== -1
     if (path && path.length > 0) {
         console.log('path is :', path);
@@ -269,62 +231,50 @@ var hasPath = function (path) {
 };
 // 接收消息
 function uint8ArrayToString(arr) {
-    var utf8 = Array.from(arr).map(function (byte) { return String.fromCharCode(byte); }).join('');
+    const utf8 = Array.from(arr).map(byte => String.fromCharCode(byte)).join('');
     return decodeURIComponent(escape(utf8));
 }
 // 将字符串转换为 Uint8Array
 function stringToUint8Array(str) {
-    var utf8 = unescape(encodeURIComponent(str));
-    var arr = new Uint8Array(utf8.length);
-    for (var i = 0; i < utf8.length; i++) {
+    const utf8 = unescape(encodeURIComponent(str));
+    const arr = new Uint8Array(utf8.length);
+    for (let i = 0; i < utf8.length; i++) {
         arr[i] = utf8.charCodeAt(i);
     }
     return arr;
 }
 // 读取流数据
-var readAll = function (input) { return __awaiter(_this, void 0, void 0, function () {
-    var chunks, size, chunk, i, isEnd, receivedData, message, error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                chunks = [];
-                size = 1024;
-                i = 0;
-                isEnd = false;
-                _a.label = 1;
-            case 1:
-                if (!!isEnd) return [3 /*break*/, 6];
-                _a.label = 2;
-            case 2:
-                _a.trys.push([2, 4, , 5]);
-                return [4 /*yield*/, input.read(size)
-                    // console.log('chunk:', chunk);
-                    // console.log('chunk.byteLength:', chunk.byteLength);
-                    // 示例接收数据
-                ];
-            case 3:
-                chunk = _a.sent();
-                receivedData = new Uint8Array(chunk);
-                message = uint8ArrayToString(receivedData);
-                chunks.push(message);
-                if (chunk.byteLength < size) {
-                    isEnd = true;
-                    return [3 /*break*/, 6];
-                }
-                return [3 /*break*/, 5];
-            case 4:
-                error_1 = _a.sent();
-                console.error('Failed to read chunk:', error_1);
-                return [3 /*break*/, 5];
-            case 5: return [3 /*break*/, 1];
-            case 6: return [2 /*return*/, chunks.join('')];
+const readAll = async (input) => {
+    const chunks = [];
+    const size = 1024;
+    let chunk;
+    let i = 0;
+    let isEnd = false;
+    while (!isEnd) {
+        try {
+            chunk = await input.read(size);
+            // console.log('chunk:', chunk);
+            // console.log('chunk.byteLength:', chunk.byteLength);
+            // 示例接收数据
+            const receivedData = new Uint8Array(chunk);
+            const message = uint8ArrayToString(receivedData);
+            chunks.push(message);
+            if (chunk.byteLength < size) {
+                isEnd = true;
+                break;
+            }
+            // console.log('isEnd:', isEnd);
         }
-    });
-}); };
+        catch (error) {
+            console.error('Failed to read chunk:', error);
+        }
+    }
+    return chunks.join('');
+};
 /*
 偏移地址
 */
-var offsets = {
+const offsets = {
     // kDoAddMsg: 0x23D2B10, // done
     kDoAddMsg: 0x2205510,
     kGetAccountServiceMgr: 0x1C1FE90,
@@ -390,23 +340,42 @@ var offsets = {
     kSendPatMsg: 0x2D669B0,
     // const uint64_t kFreeChatMsg = 0x1C1FF10;
     // const uint64_t kNewChatMsg = 0x1C28800;
-    kNewChatMsg: 0x1C28800
+    kNewChatMsg: 0x1C28800,
+    // const uint64_t kCreateChatRoom = 0x221AF50;
+    // const uint64_t kChatRoomInfoConstructor = 0x25CF470;
+    // const uint64_t kGetChatRoomDetailInfo = 0x222BEA0;
+    // const uint64_t kGetChatroomMemberDetail = 0x2226C80;
+    // const uint64_t kDoAddMemberToChatRoom = 0x221B8A0;
+    // const uint64_t kDoDelMemberFromChatRoom = 0x221BEE0;
+    // const uint64_t kInviteMemberToChatRoom = 0x221B280;
+    // const uint64_t kQuitAndDelChatRoom = 0x2225EF0;
+    // const uint64_t kModChatRoomTopic = 0x2364610;
+    // const uint64_t kGetA8Key = 0x24ABD40;
+    // const uint64_t kTimelineGetFirstPage = 0x2EFE660;
+    // const uint64_t kTimelineGetNextPage = 0x2EFEC00;
+    // const uint64_t kSnsObjectDetail = 0x2EFDEC0;
+    // const uint64_t kSnsObjectLike = 0x2F113D0;
+    // const uint64_t kSnsObjectOp = 0x2F13670;
+    // const uint64_t kSnsObjectDoComment = 0x2EFD0F0;
+    // const uint64_t kStartupDownloadMedia = 0x2596780;
+    // const uint64_t kDoAddMsg = 0x23D2B10;
+    // const uint64_t kJSLogin =  0x27826A0;
+    // const uint64_t kTenPayTransferConfirm = 0x304C700;
+    // const uint64_t kSceneCenterStartTask = 0x2454F70;					//must do scene after auth
+    // const uint64_t kMessageLoop = 0x397B400;							//Chrome.MessageLoopProblem (__int64 a1, __int64 a2)
+    // const uint64_t kWMDestroy = 0x2119240;	
 };
-var moduleBaseAddress = Module.getBaseAddress('WeChatWin.dll');
-var selfInfo = {};
+const moduleBaseAddress = Module.getBaseAddress('WeChatWin.dll');
+let selfInfo = {};
 /*---------------------ContactSelf---------------------*/
 /*
 获取登录二维码
 */
-function contactSelfQRCode() {
-    return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/];
-    }); });
-}
+async function contactSelfQRCode() { }
 /*
 获取自己的信息 3.9.10.27
 */
-var contactSelfInfo = function () {
+const contactSelfInfo = () => {
     var success = -1;
     var out = {};
     // 确定相关函数的地址
@@ -511,7 +480,7 @@ var contactSelfInfo = function () {
         }
     }
     // console.log('out:', JSON.stringify(out, null, 2))
-    var myself = {
+    const myself = {
         id: out.wxid,
         gender: 1,
         type: out.type,
@@ -526,7 +495,7 @@ var contactSelfInfo = function () {
         corporation: '',
         title: '',
         description: '',
-        phone: [out.mobile]
+        phone: [out.mobile],
     };
     return myself;
 };
@@ -536,28 +505,28 @@ selfInfo = contactSelfInfo();
 /*
 获取联系人列表 3.9.10.27
 */
-var contactList = function () {
+const contactList = () => {
     // 使用NativeFunction调用相关函数
-    var getContactMgrInstance = new NativeFunction(moduleBaseAddress.add(offsets.kGetContactMgr), 'pointer', []);
-    var getContactListFunction = new NativeFunction(moduleBaseAddress.add(offsets.kGetContactList), 'int64', ['pointer', 'pointer']);
+    const getContactMgrInstance = new NativeFunction(moduleBaseAddress.add(offsets.kGetContactMgr), 'pointer', []);
+    const getContactListFunction = new NativeFunction(moduleBaseAddress.add(offsets.kGetContactList), 'int64', ['pointer', 'pointer']);
     // 获取联系人管理器的实例
-    var contactMgrInstance = getContactMgrInstance();
+    const contactMgrInstance = getContactMgrInstance();
     // 准备用于存储联系人信息的数组
-    var contacts = [];
-    var contactVecPlaceholder = Memory.alloc(Process.pointerSize * 3);
+    const contacts = [];
+    const contactVecPlaceholder = Memory.alloc(Process.pointerSize * 3);
     contactVecPlaceholder.writePointer(ptr(0)); // 初始化指针数组
-    var success = getContactListFunction(contactMgrInstance, contactVecPlaceholder);
-    var contactVecPtr = contactVecPlaceholder.readU32();
+    const success = getContactListFunction(contactMgrInstance, contactVecPlaceholder);
+    const contactVecPtr = contactVecPlaceholder.readU32();
     // 解析联系人信息
     if (success) {
-        var contactPtr = contactVecPlaceholder;
-        var start = contactPtr.readPointer();
-        var end = contactPtr.add(Process.pointerSize * 2).readPointer();
-        var CONTACT_SIZE = 0x6A8; // 假设每个联系人数据结构的大小
+        const contactPtr = contactVecPlaceholder;
+        let start = contactPtr.readPointer();
+        const end = contactPtr.add(Process.pointerSize * 2).readPointer();
+        const CONTACT_SIZE = 0x6A8; // 假设每个联系人数据结构的大小
         while (start.compare(end) < 0) {
             try {
                 // console.log('start:', start)
-                var contact = parseContact(start);
+                const contact = parseContact(start);
                 // console.log('contact:', JSON.stringify(contact, null, 2))
                 if (contact.id && (!contact.id.endsWith('chatroom'))) {
                     contacts.push(contact);
@@ -578,7 +547,7 @@ function parseContact(start) {
     /* Get Contacts:
     call1, call2, wxId, Code, Remark,Name, Gender, Country, Province, City*/
     // { 0x75A4A0, 0xC089F0, 0x10, 0x24, 0x58, 0x6C, 0x0E, 0x00, 0x00, 0x00 },
-    var temp = {
+    const temp = {
         wxid: readWideString(start.add(0x10)),
         custom_account: readWideString(start.add(0x30)),
         encrypt_name: readWideString(start.add(0x50)),
@@ -592,10 +561,10 @@ function parseContact(start) {
         verify_flag: start.add(0x70).readS32(),
         type: start.add(0x74).readS32(),
         reserved1: start.add(0x1F0).readS32(),
-        reserved2: start.add(0x1F4).readS32()
+        reserved2: start.add(0x1F4).readS32(),
     };
     // console.log('temp:', JSON.stringify(temp, null, 2))
-    var info = {};
+    const info = {};
     /*
     // mmString   UserName;			//0x10  + 0x20
     info.UserName = start.add(0x10 + 0x20).readPointer().readUtf16String();
@@ -717,7 +686,7 @@ function parseContact(start) {
     // console.log('contact info:', JSON.stringify(info, null, 2))
   
     */
-    var contact = {
+    const contact = {
         id: temp.wxid,
         gender: 1,
         type: temp.type,
@@ -734,19 +703,14 @@ function parseContact(start) {
         corporation: '',
         title: '',
         description: '',
-        phone: []
+        phone: [],
     };
     return contact;
 }
 /*
 获取联系人详情
 */
-function contactRawPayload(id) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/];
-        });
-    });
+async function contactRawPayload(id) {
 }
 /*---------------------Room---------------------*/
 /*
@@ -754,26 +718,26 @@ function contactRawPayload(id) {
 */
 function roomList() {
     // 使用NativeFunction调用相关函数
-    var getContactMgrInstance = new NativeFunction(moduleBaseAddress.add(offsets.kGetContactMgr), 'pointer', []);
-    var getContactListFunction = new NativeFunction(moduleBaseAddress.add(offsets.kGetContactList), 'int64', ['pointer', 'pointer']);
+    const getContactMgrInstance = new NativeFunction(moduleBaseAddress.add(offsets.kGetContactMgr), 'pointer', []);
+    const getContactListFunction = new NativeFunction(moduleBaseAddress.add(offsets.kGetContactList), 'int64', ['pointer', 'pointer']);
     // 获取联系人管理器的实例
-    var contactMgrInstance = getContactMgrInstance();
+    const contactMgrInstance = getContactMgrInstance();
     // 准备用于存储联系人信息的数组
-    var contacts = [];
-    var contactVecPlaceholder = Memory.alloc(Process.pointerSize * 3);
+    const contacts = [];
+    const contactVecPlaceholder = Memory.alloc(Process.pointerSize * 3);
     contactVecPlaceholder.writePointer(ptr(0)); // 初始化指针数组
-    var success = getContactListFunction(contactMgrInstance, contactVecPlaceholder);
-    var contactVecPtr = contactVecPlaceholder.readU32();
+    const success = getContactListFunction(contactMgrInstance, contactVecPlaceholder);
+    const contactVecPtr = contactVecPlaceholder.readU32();
     // 解析联系人信息
     if (success) {
-        var contactPtr = contactVecPlaceholder;
-        var start = contactPtr.readPointer();
-        var end = contactPtr.add(Process.pointerSize * 2).readPointer();
-        var CONTACT_SIZE = 0x6A8; // 假设每个联系人数据结构的大小
+        const contactPtr = contactVecPlaceholder;
+        let start = contactPtr.readPointer();
+        const end = contactPtr.add(Process.pointerSize * 2).readPointer();
+        const CONTACT_SIZE = 0x6A8; // 假设每个联系人数据结构的大小
         while (start.compare(end) < 0) {
             try {
                 // console.log('start:', start)
-                var contact = parseContact(start);
+                const contact = parseContact(start);
                 // console.log('contact:', JSON.stringify(contact, null, 2))
                 if (contact.id && (contact.id.endsWith('chatroom'))) {
                     contacts.push(contact);
@@ -792,208 +756,121 @@ function roomList() {
 /*
 解散群
 */
-function roomDel(roomId, contactId) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/, roomId];
-        });
-    });
+async function roomDel(roomId, contactId) {
+    return roomId;
 }
 /*
 获取群头像
 */
-function roomAvatar(roomId) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/, ''];
-        });
-    });
+async function roomAvatar(roomId) {
+    return '';
 }
 /*
 加入群
 */
-function roomAdd(roomId, contactId) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/];
-        });
-    });
+async function roomAdd(roomId, contactId) {
 }
 /*
 设置群名称
 */
-function roomTopic(roomId, topic) {
-    return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/];
-    }); });
-}
+async function roomTopic(roomId, topic) { }
 /*
 创建群
 */
-function roomCreate(contactIdList, topic) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/, 'mock_room_id'];
-        });
-    });
+async function roomCreate(contactIdList, topic) {
+    return 'mock_room_id';
 }
 /*
 退出群
 */
-function roomQuit(roomId) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/];
-        });
-    });
+async function roomQuit(roomId) {
 }
 /*
 获取群二维码
 */
-function roomQRCode(roomId) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/, roomId + ' mock qrcode'];
-        });
-    });
+async function roomQRCode(roomId) {
+    return roomId + ' mock qrcode';
 }
 /*
 获取群成员列表
 */
-function roomMemberList(roomId) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/];
-        });
-    });
+async function roomMemberList(roomId) {
 }
 /*---------------------Room Invitation---------------------*/
 /*
 接受群邀请
 */
-function roomInvitationAccept(roomInvitationId) {
-    return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/];
-    }); });
-}
+async function roomInvitationAccept(roomInvitationId) { }
 /*
 获取群邀请
 */
-function roomInvitationRawPayload(roomInvitationId) {
-    return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/];
-    }); });
-}
+async function roomInvitationRawPayload(roomInvitationId) { }
 /*---------------------Friendship---------------------*/
 /*
 获取好友请求
 */
-function friendshipRawPayload(id) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/, { id: id }];
-        });
-    });
+async function friendshipRawPayload(id) {
+    return { id };
 }
 /*
 手机号搜索好友
 */
-function friendshipSearchPhone(phone) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/, null];
-        });
-    });
+async function friendshipSearchPhone(phone) {
+    return null;
 }
 /*
 微信号搜索好友
 */
-function friendshipSearchWeixin(weixin) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/, null];
-        });
-    });
+async function friendshipSearchWeixin(weixin) {
+    return null;
 }
 /*
 发送好友请求
 */
-function friendshipAdd(contactId, hello) {
-    return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/];
-    }); });
-}
+async function friendshipAdd(contactId, hello) { }
 /*
 接受好友请求
 */
-function friendshipAccept(friendshipId) {
-    return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/];
-    }); });
-}
+async function friendshipAccept(friendshipId) { }
 /*---------------------Tag---------------------*/
 /*
 联系人标签添加
 */
-function tagContactAdd(tagId, contactId) {
-    return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/];
-    }); });
-}
+async function tagContactAdd(tagId, contactId) { }
 /*
 联系人标签移除
 */
-function tagContactRemove(tagId, contactId) {
-    return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/];
-    }); });
-}
+async function tagContactRemove(tagId, contactId) { }
 /*
 联系人标签删除
 */
-function tagContactDelete(tagId) {
-    return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/];
-    }); });
-}
+async function tagContactDelete(tagId) { }
 /*
 联系人标签列表
 */
-function tagContactList(contactId) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/, []];
-        });
-    });
+async function tagContactList(contactId) {
+    return [];
 }
 /*
 获取群成员详情
 */
-function roomMemberRawPayload(roomId, contactId) {
-    return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
-        return [2 /*return*/];
-    }); });
-}
+async function roomMemberRawPayload(roomId, contactId) { }
 /*
 设置群公告
 */
-function roomAnnounce(roomId, text) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            if (text) {
-                return [2 /*return*/];
-            }
-            return [2 /*return*/, 'mock announcement for ' + roomId];
-        });
-    });
+async function roomAnnounce(roomId, text) {
+    if (text) {
+        return;
+    }
+    return 'mock announcement for ' + roomId;
 }
 /*---------------------Message---------------------*/
 /*
 发送文本消息 3.9.10.27
 */
-var messageSendText = function (contactId, text) {
-    var to_user = null;
-    var text_msg = null;
+const messageSendText = (contactId, text) => {
+    let to_user = null;
+    let text_msg = null;
     to_user = writeWStringPtr(contactId);
     text_msg = writeWStringPtr(text);
     var send_message_mgr_addr = moduleBaseAddress.add(offsets.kGetSendMessageMgr);
@@ -1020,79 +897,49 @@ var messageSendText = function (contactId, text) {
 /*
 发送图片消息
 */
-function messageSendFile(conversationId, file) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/];
-        });
-    });
+async function messageSendFile(conversationId, file) {
 }
 /*
 发送联系人名片
 */
-function messageSendContact(conversationId, contactId) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/];
-        });
-    });
+async function messageSendContact(conversationId, contactId) {
 }
 /*
 发送链接消息
 */
-function messageSendUrl(conversationId, urlLinkPayload) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/];
-        });
-    });
+async function messageSendUrl(conversationId, urlLinkPayload) {
 }
 /*
 发送小程序消息
 */
-function messageSendMiniProgram(conversationId, miniProgramPayload) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/];
-        });
-    });
+async function messageSendMiniProgram(conversationId, miniProgramPayload) {
 }
 /*
 发送位置消息
 */
-function messageSendLocation(conversationId, locationPayload) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/];
-        });
-    });
+async function messageSendLocation(conversationId, locationPayload) {
 }
 /*
 转发消息
 */
-function messageForward(conversationId, messageId) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            return [2 /*return*/];
-        });
-    });
+async function messageForward(conversationId, messageId) {
 }
 /*
 拍一拍消息
 */
-var sendPatMsg = function (roomId, contactId) {
+const sendPatMsg = (roomId, contactId) => {
     // 定义一个NativeFunction来代表 SendPatMsg 函数
-    var SendPatMsg = new NativeFunction(moduleBaseAddress.add(offsets.kSendPatMsg), 'int64', // 假设返回类型为int64
+    const SendPatMsg = new NativeFunction(moduleBaseAddress.add(offsets.kSendPatMsg), 'int64', // 假设返回类型为int64
     ['pointer', 'pointer', 'int64']);
     // 现在，我们需要一种方式来创建WeChatWString类的实例并将其传递给SendPatMsg。
     // 这里的createWeChatWString函数是一个假设函数，需要你根据WeChatWString的实际内存结构来实现。
-    var roomIdStrPointer = writeWStringPtr(roomId);
-    var wxidStrPointer = writeWStringPtr(contactId);
-    var arg3 = Memory.alloc(0x8);
+    const roomIdStrPointer = writeWStringPtr(roomId);
+    const wxidStrPointer = writeWStringPtr(contactId);
+    const arg3 = Memory.alloc(0x8);
     arg3.writeU64(0x0);
     try {
         // 调用 SendPatMsg 函数
-        var result = SendPatMsg(roomIdStrPointer, wxidStrPointer, 0);
+        const result = SendPatMsg(roomIdStrPointer, wxidStrPointer, 0);
         console.log("SendPatMsg 调用结果: ", result);
     }
     catch (e) {
@@ -1102,7 +949,7 @@ var sendPatMsg = function (roomId, contactId) {
 // sendPatMsg('21341182572@chatroom', 'tyutluyc')
 // 调试：监听函数调用
 Interceptor.attach(moduleBaseAddress.add(offsets.kSendPatMsg), {
-    onEnter: function (args) {
+    onEnter(args) {
         try {
             // 参数打印
             console.log("sendImageMsg called with args: " + args[0] + ", " + args[1] + ", " + args[2] + ", " + args[3] + ", " + args[4] + ", " + args[5] + ", " + args[6] + ", " + args[7]);
@@ -1119,32 +966,32 @@ Interceptor.attach(moduleBaseAddress.add(offsets.kSendPatMsg), {
             console.error('接收消息回调失败：', e);
             throw new Error(e);
         }
-    }
+    },
 });
 /*---------------------Hook---------------------*/
 /*
 接收消息回调 3.9.10.27
 */
-var recvMsgNativeCallback = (function () {
-    var nativeCallback = new NativeCallback(function () { }, 'void', ['int32', 'pointer', 'pointer', 'pointer', 'pointer', 'int32']);
-    var nativeativeFunction = new NativeFunction(nativeCallback, 'void', ['int32', 'pointer', 'pointer', 'pointer', 'pointer', 'int32']);
+const recvMsgNativeCallback = (() => {
+    const nativeCallback = new NativeCallback(() => { }, 'void', ['int32', 'pointer', 'pointer', 'pointer', 'pointer', 'int32']);
+    const nativeativeFunction = new NativeFunction(nativeCallback, 'void', ['int32', 'pointer', 'pointer', 'pointer', 'pointer', 'int32']);
     try {
         Interceptor.attach(moduleBaseAddress.add(offsets.kDoAddMsg), {
-            onEnter: function (args) {
+            onEnter(args) {
                 try {
                     // 参数打印
                     // console.log("doAddMsg called with args: " + args[0] + ", " + args[1] + ", " + args[2]);
                     // 调用处理函数
-                    var msg = HandleSyncMsg(args[0], args[1], args[2]);
+                    const msg = HandleSyncMsg(args[0], args[1], args[2]);
                     // console.log("msg: " + JSON.stringify(msg, null, 2));
-                    var room = '';
-                    var talkerId = '';
-                    var listenerId = '';
-                    var text = msg.content;
-                    var signature = msg.signature;
-                    var msgType_1 = msg.type;
-                    var isSelf = msg.isSelf;
-                    var filename = '';
+                    let room = '';
+                    let talkerId = '';
+                    let listenerId = '';
+                    const text = msg.content;
+                    const signature = msg.signature;
+                    const msgType = msg.type;
+                    const isSelf = msg.isSelf;
+                    let filename = '';
                     if (msg.fromUser.indexOf('@') !== -1) {
                         room = msg.fromUser;
                     }
@@ -1167,62 +1014,57 @@ var recvMsgNativeCallback = (function () {
                             talkerId = msg.fromUser;
                         }
                     }
-                    if (msgType_1 === 3) {
+                    if (msgType === 3) {
                         filename = JSON.parse(msg.content)[0];
                     }
-                    if (msgType_1 === 49) {
-                        var content = msg.content;
+                    if (msgType === 49) {
+                        const content = msg.content;
                         // <title>example_upsert.json</title>\n        <des></des>\n        <action>view</action>\n        <type>6</type>\n   
                         // 使用正则提取出文件名和type
-                        var subType = content.match(/<type>(\d+)<\/type>/);
+                        const subType = content.match(/<type>(\d+)<\/type>/);
                         if (subType && subType[1] === '6') {
-                            var filenames = content.match(/<title>(.*)<\/title>/);
+                            const filenames = content.match(/<title>(.*)<\/title>/);
                             if (filenames) {
-                                var curTime = new Date();
-                                filename = "".concat(selfInfo.id, "\\FileStorage\\File\\").concat(curTime.getFullYear(), "-").concat(curTime.getMonth() < 9 ? '0' : '').concat(curTime.getMonth() + 1, "\\").concat(filenames[1]);
+                                const curTime = new Date();
+                                filename = `${selfInfo.id}\\FileStorage\\File\\${curTime.getFullYear()}-${curTime.getMonth() < 9 ? '0' : ''}${curTime.getMonth() + 1}\\${filenames[1]}`;
                                 console.log('filename:', filename);
                             }
                         }
                     }
-                    var message = {
+                    const message = {
                         id: msg.msgId,
-                        filename: filename,
-                        text: text,
+                        filename,
+                        text,
                         timestamp: msg.createTime,
-                        type: msgType_1,
-                        talkerId: talkerId,
+                        type: msgType,
+                        talkerId,
                         roomId: room,
                         mentionIds: [],
-                        listenerId: listenerId,
-                        isSelf: isSelf
+                        listenerId,
+                        isSelf,
                     };
                     // console.log('message:', JSON.stringify(message, null, 2))
                     // send(message)
-                    var myContentPtr_1 = Memory.alloc(text.length * 2 + 1);
-                    myContentPtr_1.writeUtf16String(text);
-                    var myTalkerIdPtr_1 = Memory.alloc(talkerId.length * 2 + 1);
-                    myTalkerIdPtr_1.writeUtf16String(talkerId);
-                    var myGroupMsgSenderIdPtr_1 = Memory.alloc(room.length * 2 + 1);
-                    myGroupMsgSenderIdPtr_1.writeUtf16String(room);
-                    var myXmlContentPtr_1 = Memory.alloc(signature.length * 2 + 1);
-                    myXmlContentPtr_1.writeUtf16String(signature);
-                    var isMyMsg_1 = 0;
-                    var newMsg = {
-                        msgType: msgType_1,
-                        talkerId: talkerId,
-                        text: text,
-                        room: room,
-                        signature: signature,
-                        isMyMsg: isMyMsg_1
+                    const myContentPtr = Memory.alloc(text.length * 2 + 1);
+                    myContentPtr.writeUtf16String(text);
+                    const myTalkerIdPtr = Memory.alloc(talkerId.length * 2 + 1);
+                    myTalkerIdPtr.writeUtf16String(talkerId);
+                    const myGroupMsgSenderIdPtr = Memory.alloc(room.length * 2 + 1);
+                    myGroupMsgSenderIdPtr.writeUtf16String(room);
+                    const myXmlContentPtr = Memory.alloc(signature.length * 2 + 1);
+                    myXmlContentPtr.writeUtf16String(signature);
+                    const isMyMsg = 0;
+                    const newMsg = {
+                        msgType, talkerId, text, room, signature, isMyMsg
                     };
                     // console.log('agent 回调消息:', JSON.stringify(newMsg))
-                    setImmediate(function () { return nativeativeFunction(msgType_1, myTalkerIdPtr_1, myContentPtr_1, myGroupMsgSenderIdPtr_1, myXmlContentPtr_1, isMyMsg_1); });
+                    setImmediate(() => nativeativeFunction(msgType, myTalkerIdPtr, myContentPtr, myGroupMsgSenderIdPtr, myXmlContentPtr, isMyMsg));
                 }
                 catch (e) {
                     console.error('接收消息回调失败：', e);
                     throw new Error(e);
                 }
-            }
+            },
         });
         return nativeCallback;
     }
@@ -1237,7 +1079,7 @@ function HandleSyncMsg(param1, param2, param3) {
     /* Receive Message:
         Hook,  call, msgId, type, isSelf, ts, roomId, content, wxid, sign, thumb, extra, msgXml */
     // { 0x00, 0x2205510, 0x30, 0x38, 0x3C, 0x44, 0x48, 0x88, 0x240, 0x260, 0x280, 0x2A0, 0x308 },
-    var msg = {
+    const msg = {
         fromUser: '',
         toUser: '',
         content: '',
@@ -1247,7 +1089,7 @@ function HandleSyncMsg(param1, param2, param3) {
         createTime: 0,
         displayFullContent: '',
         type: 0,
-        isSelf: false
+        isSelf: false,
     };
     msg.msgId = param2.add(0x30).readS64(); // 消息ID
     // console.log("msg.msgId: " + msg.msgId);
@@ -1265,13 +1107,13 @@ function HandleSyncMsg(param1, param2, param3) {
     // console.log("msg.fromUser: " + msg.fromUser);
     msg.signature = ReadWeChatStr(param2.add(0x260)); // 消息签名
     // console.log("msg.signature: " + msg.signature);
-    var msgXml = getStringByStrAddr(param2.add(0x308)); // 消息签名
+    const msgXml = getStringByStrAddr(param2.add(0x308)); // 消息签名
     // console.log("msg.msgXml: " + msgXml);
     // 根据消息类型处理图片消息
     if (msg['type'] == 3) {
-        var thumb = getStringByStrAddr(param2.add(0x280)); // 消息签名
+        const thumb = getStringByStrAddr(param2.add(0x280)); // 消息签名
         // console.log("msg.thumb: " + thumb);
-        var extra = getStringByStrAddr(param2.add(0x2A0)); // 消息签名
+        const extra = getStringByStrAddr(param2.add(0x2A0)); // 消息签名
         // console.log("msg.extra: " + extra);
         // const img = ReadSKBuiltinBuffer(param2.add(0x40).readS64()); // 读取图片数据
         // console.log("img: " + img);
