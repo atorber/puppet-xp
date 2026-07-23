@@ -13,7 +13,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/wechaty/wechaty-puppet-xp.svg?label=github%20stars)](https://github.com/wechaty/wechaty)
 [![Gitter](https://badges.gitter.im/wechaty/wechaty.svg)](https://gitter.im/wechaty/wechaty?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-<img src="https://github.com/atorber/puppet-xp/assets/19552906/ac34b791-bfff-4beb-9631-088939d40465" alt="chatie puppet xp" width="300" height="300" align="bottom" style="border-radius: 24px;" />
+<img src="./docs/images/puppet-xp-logo.png" alt="chatie puppet xp" width="300" height="300" align="bottom" />
 
 - Official website: <https://wechaty.js.org/docs/puppet-providers/xp>
 - Join XP Discord: <https://discord.gg/uE8Tb77VBm>
