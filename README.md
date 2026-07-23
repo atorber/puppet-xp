@@ -191,6 +191,20 @@ npm ls frida
 node -e "const frida=require('frida'); const {execSync}=require('child_process'); const pid=execSync('powershell -NoProfile -Command \"(Get-Process WeChat | Select -First 1).Id\"').toString().trim(); frida.attach(Number(pid)).then(s=>{console.log('attach OK',s.pid); return s.detach();}).catch(e=>{console.error(e.message); process.exit(1);})"
 ```
 
+### 7. `git push` 失败：`ambiguous argument 'HEAD0'`（Windows）
+
+`@chatie/git-scripts` 的 pre-push 会执行 `git log ... HEAD^0`。在 Windows `cmd.exe` 中 `^` 是转义符，`HEAD^0` 会被变成 `HEAD0` 导致 hook 失败。
+
+本仓库已改为使用 `scripts/git-pre-push.js`（见 `package.json` → `git.scripts.pre-push`）。若仍指向旧脚本，请确认 `package.json` 中为：
+
+```json
+"git": {
+  "scripts": {
+    "pre-push": "node scripts/git-pre-push.js"
+  }
+}
+```
+
 ## HISTORY
 
 ### v2.1.1
